@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>विVIDHA Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #C9A84C; --gold-light: #E8C97A; --gold-pale: #F7F0DC;
+      --navy: #1B2A4A; --navy-mid: #2D4070;
+      --pink: #E8789A; --pink-pale: #FDF0F5;
+      --ivory: #FAF8F3; --ivory-deep: #F2EDE3;
+      --white: #FFFFFF; --charcoal: #2C2C2C;
+      --text-main: #1E1E1E; --text-muted: #6B6B6B; --text-light: #9A9A9A;
+      --border: #E8E0D0; --sidebar-w: 240px;
+      --success: #27AE60; --danger: #E74C3C; --warn: #F39C12;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Jost', sans-serif;
+      --font-deva: 'Noto Sans Devanagari', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: #F0EDE6; color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
+    input, select, textarea { font-family: var(--font-body); }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(27,42,74,0.2); border-radius: 2px; }
+
+    /* ─── LOGIN SCREEN ─── */
+    #loginScreen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .login-card {
+      background: white; border-radius: 20px;
+      width: 100%; max-width: 400px;
+      padding: 48px 40px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .login-logo { font-family: var(--font-deva); font-size: 28px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .login-logo span { color: var(--gold); }
+    .login-badge {
+      display: inline-block;
+      background: var(--gold-pale);
+      color: var(--gold);
+      font-size: 10px; letter-spacing: 2px; font-weight: 600; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 20px; margin-bottom: 28px; border: 1px solid var(--gold-light);
+    }
+    .login-title { font-family: var(--font-display); font-size: 26px; font-weight: 500; margin-bottom: 6px; }
+    .login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+    .login-form .form-group { margin-bottom: 16px; text-align: left; }
+    .login-form label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .login-form input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .login-form input:focus { border-color: var(--navy); }
+    .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: white; border-radius: 8px; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 8px; transition: opacity 0.2s; }
+    .login-btn:hover { opacity: 0.9; }
+    .login-error { background: #FFF0F0; border: 1px solid #FFD0D0; color: var(--danger); font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; display: none; }
+    .login-error.show { display: block; }
+
+    /* ─── APP SHELL ─── */
+    #appShell { display: none; }
+    #appShell.visible { display: flex; min-height: 100vh; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--navy); color: white;
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh;
+      z-index: 100; overflow-y: auto;
+    }
+    .sidebar-head {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo { font-family: var(--font-deva); font-size: 20px; font-weight: 700; color: white; }
+    .sidebar-logo span { color: var(--gold); }
+    .sidebar-admin-tag { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-light); margin-top: 2px; opacity: 0.7; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
+    .nav-section-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 14px 12px 6px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px;
+      font-size: 13px; font-weight: 400;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer; transition: all 0.2s; margin-bottom: 2px;
+      position: relative;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.07); color: white; }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.08)); color: var(--gold-light); font-weight: 500; }
+    .nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:20px; background:var(--gold); border-radius:0 3px 3px 0; }
+    .nav-item i { width: 16px; text-align: center; }
+    .nav-badge { margin-left: auto; background: var(--danger); color: white; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dark, #A8872E)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 500; }
+    .user-role { font-size: 10px; color: var(--gold-light); }
+    .logout-btn { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 12px; color: rgba(255,255,255,0.5); transition: all 0.2s; width: 100%; margin-top: 4px; }
+    .logout-btn:hover { background: rgba(231,76,60,0.15); color: #FF8A80; }
+
+    /* ─── MAIN CONTENT ─── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: 0 32px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    }
+    .topbar-title { font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--navy); }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .topbar-search { display: flex; align-items: center; gap: 8px; background: var(--ivory); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; min-width: 200px; }
+    .topbar-search input { background: none; border: none; outline: none; font-size: 13px; color: var(--text-main); width: 100%; }
+    .topbar-search input::placeholder { color: var(--text-light); }
+    .content { padding: 32px; flex: 1; }
+
+    /* ─── STAT CARDS ─── */
+    .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--white); border-radius: 14px;
+      padding: 20px 18px;
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; opacity:0.06; }
+    .stat-card.orders::before { background: var(--navy); }
+    .stat-card.revenue::before { background: var(--gold); }
+    .stat-card.products::before { background: var(--pink); }
+    .stat-card.pending::before { background: var(--warn); }
+    .stat-card.customers::before { background: var(--success); }
+    .stat-card.stock::before { background: var(--danger); }
+    .stat-icon { font-size: 20px; margin-bottom: 10px; opacity: 0.7; }
+    .stat-val { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+
+    /* ─── SECTION CARD ─── */
+    .card { background: var(--white); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .card-title { font-family: var(--font-display); font-size: 20px; font-weight: 500; color: var(--navy); }
+    .card-body { padding: 0; }
+
+    /* ─── TABLE ─── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { padding: 12px 20px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); background: var(--ivory); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .data-table td { padding: 14px 20px; border-bottom: 1px solid var(--border); color: var(--text-main); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--ivory); }
+    .td-name { font-weight: 500; color: var(--charcoal); }
+    .td-img { width: 44px; height: 54px; border-radius: 8px; object-fit: cover; background: var(--ivory-deep); }
+    .td-price { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--gold-dark, #A8872E); }
+    .td-cat { font-size: 11px; color: var(--text-muted); }
+    .stock-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+    .stock-badge.low { color: var(--danger); }
+    .stock-badge.ok { color: var(--success); }
+    .stock-badge.zero { color: var(--text-light); }
+    .status-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .status-tag.active { background: #E8F5E9; color: var(--success); }
+    .status-tag.inactive { background: #FFF3E0; color: var(--warn); }
+    .order-status { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .order-status.delivered { background: #E8F5E9; color: var(--success); }
+    .order-status.shipped { background: #E3F2FD; color: #1565C0; }
+    .order-status.confirmed { background: var(--gold-pale); color: var(--gold-dark, #A8872E); }
+    .order-status.pending { background: #FFF3E0; color: var(--warn); }
+    .order-status.cancelled { background: #FFEBEE; color: var(--danger); }
+    .payment-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .payment-tag.paid { background: #E8F5E9; color: var(--success); }
+    .payment-tag.pending { background: #FFF3E0; color: var(--warn); }
+    .action-btns { display: flex; gap: 6px; }
+    .act-btn { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.15s; border: 1px solid transparent; }
+    .act-btn.edit { background: var(--gold-pale); color: var(--gold-dark, #A8872E); border-color: var(--gold-light); }
+    .act-btn.edit:hover { background: var(--gold); color: white; }
+    .act-btn.del { background: #FFEBEE; color: var(--danger); border-color: #FFCDD2; }
+    .act-btn.del:hover { background: var(--danger); color: white; }
+    .act-btn.view { background: #E3F2FD; color: #1565C0; border-color: #BBDEFB; }
+    .act-btn.view:hover { background: #1565C0; color: white; }
+
+    /* ─── BUTTONS ─── */
+    .btn { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 10px 20px; border-radius: 8px; transition: all 0.2s; cursor: pointer; border: none; }
+    .btn-navy { background: var(--navy); color: white; box-shadow: 0 3px 10px rgba(27,42,74,0.2); }
+    .btn-navy:hover { background: var(--navy-mid); transform: translateY(-1px); }
+    .btn-gold { background: linear-gradient(135deg, var(--gold), #A8872E); color: white; }
+    .btn-gold:hover { transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-sm { padding: 7px 14px; font-size: 11px; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ─── MODAL ─── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+    .modal-overlay.open { opacity: 1; visibility: visible; }
+    .modal { background: var(--white); border-radius: 18px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; transform: scale(0.96) translateY(16px); transition: transform 0.3s; }
+    .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+    .modal-header { padding: 28px 32px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--navy); }
+    .modal-close { width: 32px; height: 32px; border-radius: 50%; background: var(--ivory-deep); font-size: 18px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+    .modal-close:hover { background: var(--border); }
+    .modal-body { padding: 24px 32px 32px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text-main); background: var(--ivory); outline: none; transition: border-color 0.2s; font-family: var(--font-body); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--navy); background: white; }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .section-divider { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: var(--gold-dark, #A8872E); padding-bottom: 8px; border-bottom: 1px solid var(--gold-pale); margin-bottom: 16px; margin-top: 8px; }
+    .modal-footer { padding: 16px 32px 24px; display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ─── IMG UPLOAD ─── */
+    .img-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .img-upload-area:hover { border-color: var(--gold); background: var(--gold-pale); }
+    .img-preview { width: 80px; height: 100px; object-fit: cover; border-radius: 8px; margin: 0 auto 8px; display: none; }
+    .img-upload-text { font-size: 13px; color: var(--text-muted); }
+    .img-upload-text span { color: var(--gold-dark, #A8872E); font-weight: 600; }
+
+    /* ─── PAGES ─── */
+    .admin-page { display: none; }
+    .admin-page.active { display: block; }
+
+    /* ─── BANNERS ─── */
+    .banner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px; }
+    .banner-card { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+    .banner-card img { width: 100%; height: 140px; object-fit: cover; }
+    .banner-card-info { padding: 12px 14px; }
+    .banner-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .banner-card-meta { font-size: 11px; color: var(--text-muted); }
+    .banner-card-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+    /* ─── ORDERS FILTERS ─── */
+    .filters-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .filter-chip { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); color: var(--text-muted); transition: all 0.15s; }
+    .filter-chip.active { background: var(--navy); border-color: var(--navy); color: white; }
+
+    /* ─── ANALYTICS ─── */
+    .analytics-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .analytics-chart-placeholder { background: var(--ivory); border-radius: 10px; padding: 20px; height: 220px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 150px; }
+    .chart-bar { flex: 1; border-radius: 4px 4px 0 0; background: linear-gradient(to top, var(--navy), var(--navy-mid)); opacity: 0.8; transition: opacity 0.2s; cursor: pointer; position: relative; }
+    .chart-bar:hover { opacity: 1; }
+    .chart-bar .bar-tip { position: absolute; top: -24px; left: 50%; transform: translateX(-50%); background: var(--navy); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
+    .chart-bar:hover .bar-tip { opacity: 1; }
+    .chart-labels { display: flex; gap: 8px; }
+    .chart-label { flex: 1; text-align: center; font-size: 10px; color: var(--text-muted); }
+
+    /* ─── COUPONS ─── */
+    .coupon-card { background: var(--ivory); border-radius: 10px; border: 1px dashed var(--border); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .coupon-code { font-family: monospace; font-size: 16px; font-weight: 700; color: var(--navy); letter-spacing: 2px; }
+    .coupon-meta { font-size: 12px; color: var(--text-muted); }
+
+    /* ─── TOAST ─── */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .analytics-grid { grid-template-columns: 1fr; } .banner-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">वि<span>VIDHA</span></div>
+    <div class="login-badge">Admin Panel</div>
+    <div class="login-title">Sign In</div>
+    <div class="login-sub">Enter your admin credentials to continue</div>
+    <form class="login-form" onsubmit="adminLogin(event)">
+      <div class="login-error" id="loginErr"></div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="adminEmail" placeholder="admin@vividha.in" required autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="login-btn">Access Admin Panel →</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── APP SHELL ── -->
+<div id="appShell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">वि<span>VIDHA</span></div>
+      <div class="sidebar-admin-tag">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showAdminPage('dashboard', this)"><i class="fa-solid fa-gauge"></i> Dashboard</div>
+      <div class="nav-item" onclick="showAdminPage('analytics', this)"><i class="fa-solid fa-chart-line"></i> Analytics</div>
+      <div class="nav-section-label">Catalog</div>
+      <div class="nav-item" onclick="showAdminPage('products', this)"><i class="fa-solid fa-shirt"></i> Products</div>
+      <div class="nav-item" onclick="showAdminPage('categories', this)"><i class="fa-solid fa-tags"></i> Categories</div>
+      <div class="nav-item" onclick="showAdminPage('banners', this)"><i class="fa-solid fa-image"></i> Banners</div>
+      <div class="nav-section-label">Sales</div>
+      <div class="nav-item" onclick="showAdminPage('orders', this)"><i class="fa-solid fa-box"></i> Orders</div>
+      <div class="nav-item" onclick="showAdminPage('customers', this)"><i class="fa-solid fa-users"></i> Customers</div>
+      <div class="nav-item" onclick="showAdminPage('coupons', this)"><i class="fa-solid fa-ticket"></i> Coupons</div>
+      <div class="nav-section-label">Alerts</div>
+      <div class="nav-item" onclick="showAdminPage('lowstock', this)"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock <span class="nav-badge" id="lowStockBadge">0</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">A</div>
+        <div><div class="user-name">Admin</div><div class="user-role">Super Admin</div></div>
+      </div>
+      <button class="logout-btn" onclick="adminLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      <a href="index.html" class="logout-btn" style="margin-top:2px;"><i class="fa-solid fa-store"></i> Exit to Store</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <div class="topbar-search"><i class="fa-solid fa-magnifying-glass" style="color:var(--text-light)"></i><input type="text" placeholder="Search anything..." id="adminSearch" oninput="globalSearch(this.value)" /></div>
+        <button class="btn btn-gold btn-sm" onclick="showAdminPage('products'); openProductModal()"><i class="fa-solid fa-plus"></i> Add Product</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="admin-page active" id="page-dashboard">
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card orders"><div class="stat-icon">📦</div><div class="stat-val" id="statOrders">0</div><div class="stat-label">Orders Today</div></div>
+          <div class="stat-card revenue"><div class="stat-icon">₹</div><div class="stat-val" id="statRevenue">₹0</div><div class="stat-label">Revenue Today</div></div>
+          <div class="stat-card products"><div class="stat-icon">👗</div><div class="stat-val" id="statProducts">0</div><div class="stat-label">Total Products</div></div>
+          <div class="stat-card pending"><div class="stat-icon">⏳</div><div class="stat-val" id="statPending">0</div><div class="stat-label">Pending Orders</div></div>
+          <div class="stat-card customers"><div class="stat-icon">👥</div><div class="stat-val" id="statCustomers">0</div><div class="stat-label">Total Customers</div></div>
+          <div class="stat-card stock"><div class="stat-icon">⚠️</div><div class="stat-val" id="statLowStock">0</div><div class="stat-label">Low Stock</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Orders</div>
+            <button class="btn btn-outline btn-sm" onclick="showAdminPage('orders')">View All →</button>
+          </div>
+          <div class="card-body"><table class="data-table" id="recentOrdersTable"><thead><tr><th>Order #</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="recentOrdersBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div class="admin-page" id="page-analytics">
+        <div class="analytics-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Revenue — Last 7 Days</div></div>
+            <div class="card-body" style="padding:20px;">
+              <div class="analytics-chart-placeholder">
+                <div class="chart-bars" id="revenueBars"></div>
+                <div class="chart-labels" id="revenueLabels"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Top Categories</div></div>
+            <div class="card-body" style="padding:20px;" id="topCatsAnalytics"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Top Selling Products</div></div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Units Sold</th><th>Revenue</th></tr></thead><tbody id="topProductsBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ── PRODUCTS ── -->
+      <div class="admin-page" id="page-products">
+        <div class="card">
+          <div class="card-header">
+            <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+              <div class="card-title">Products</div>
+              <select class="form-select" style="width:auto; padding:7px 12px; font-size:12px;" onchange="filterAdminProducts(this.value)" id="adminCatFilter">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <div class="topbar-search" style="min-width:180px;"><i class="fa-solid fa-magnifying-glass" style="color:var(--text-light)"></i><input type="text" placeholder="Search products..." oninput="searchAdminProducts(this.value)" /></div>
+              <button class="btn btn-navy btn-sm" onclick="openProductModal()"><i class="fa-solid fa-plus"></i> Add Product</button>
+              <button class="btn btn-outline btn-sm" onclick="resetToDemo()" title="Reset to demo data"><i class="fa-solid fa-rotate-left"></i> Reset Demo</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Image</th><th>Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="adminProductsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CATEGORIES ── -->
+      <div class="admin-page" id="page-categories">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Categories</div>
+            <button class="btn btn-navy btn-sm" onclick="openCategoryModal()"><i class="fa-solid fa-plus"></i> Add Category</button>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Sub-Categories</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="adminCategoriesBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BANNERS ── -->
+      <div class="admin-page" id="page-banners">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Banners & Hero Sections</div>
+            <button class="btn btn-navy btn-sm" onclick="openBannerModal()"><i class="fa-solid fa-plus"></i> Add Banner</button>
+          </div>
+          <div class="banner-grid" id="bannersGrid"></div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS ── -->
+      <div class="admin-page" id="page-orders">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">All Orders</div>
+            <div class="filters-row">
+              <div class="filter-chip active" onclick="filterOrders('', this)">All</div>
+              <div class="filter-chip" onclick="filterOrders('pending', this)">Pending</div>
+              <div class="filter-chip" onclick="filterOrders('confirmed', this)">Confirmed</div>
+              <div class="filter-chip" onclick="filterOrders('shipped', this)">Shipped</div>
+              <div class="filter-chip" onclick="filterOrders('delivered', this)">Delivered</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="adminOrdersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CUSTOMERS ── -->
+      <div class="admin-page" id="page-customers">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Customers</div></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spent</th><th>Joined</th><th>Admin</th></tr></thead>
+              <tbody id="adminCustomersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── COUPONS ── -->
+      <div class="admin-page" id="page-coupons">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Coupons</div>
+            <button class="btn btn-navy btn-sm" onclick="openCouponModal()"><i class="fa-solid fa-plus"></i> Create Coupon</button>
+          </div>
+          <div class="card-body" style="padding:20px; display:flex; flex-direction:column; gap:12px;" id="couponsGrid"></div>
+        </div>
+      </div>
+
+      <!-- ── LOW STOCK ── -->
+      <div class="admin-page" id="page-lowstock">
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚠️ Low Stock Alerts</div></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Product</th><th>Category</th><th>Current Stock</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="lowStockBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /appShell -->
+
+<!-- ── ADD/EDIT PRODUCT MODAL ── -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <div class="modal-title" id="productModalTitle">Add Product</div>
+      <button class="modal-close" onclick="closeModal('productModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editProductId" />
+      <div class="section-divider">Basic Info</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input class="form-input" type="text" id="pName" placeholder="e.g., Kanjivaram Silk Saree" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">SKU</label>
+          <input class="form-input" type="text" id="pSku" placeholder="Auto-generated" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-select" id="pCategory" onchange="updateSubCatOptions()">
+            <option value="">Select Category...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sub-Category</label>
+          <select class="form-select" id="pSubCategory"><option value="">None</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Brand</label>
+          <input class="form-input" type="text" id="pBrand" placeholder="e.g., Vividha Studio" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fabric</label>
+          <input class="form-input" type="text" id="pFabric" placeholder="e.g., Pure Silk, Cotton" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Short Description</label>
+        <input class="form-input" type="text" id="pShortDesc" placeholder="One-line description..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Description</label>
+        <textarea class="form-textarea" id="pDesc" placeholder="Detailed product description..."></textarea>
+      </div>
+      <div class="section-divider">Pricing & Inventory</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Price (₹) *</label>
+          <input class="form-input" type="number" id="pPrice" placeholder="999" min="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Original Price (₹)</label>
+          <input class="form-input" type="number" id="pOriginalPrice" placeholder="1499" min="0" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Stock Quantity *</label>
+          <input class="form-input" type="number" id="pStock" placeholder="10" min="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tag</label>
+          <select class="form-select" id="pTag">
+            <option value="">None</option>
+            <option value="new">New</option>
+            <option value="hot">Hot / Trending</option>
+            <option value="sale">On Sale</option>
+          </select>
+        </div>
+      </div>
+      <div class="section-divider">Product Image</div>
+      <div class="form-group">
+        <label class="form-label">Image URL (S3 or direct link)</label>
+        <input class="form-input" type="url" id="pImageUrl" placeholder="https://s3.amazonaws.com/bucket/image.jpg" oninput="previewImageUrl(this.value)" />
+      </div>
+      <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:16px;">
+        <img id="pImagePreview" src="" alt="" style="width:80px; height:100px; object-fit:cover; border-radius:8px; border:1px solid var(--border); display:none;" />
+        <div>
+          <label class="form-label">Or Upload File</label>
+          <input type="file" accept="image/*" onchange="handleImageUpload(this)" style="font-size:12px;" />
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Will upload to S3 on save</div>
+        </div>
+      </div>
+      <div class="section-divider">Status</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="pStatus">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Colors (comma-separated hex)</label>
+          <input class="form-input" type="text" id="pColors" placeholder="#C9A84C, #1B2A4A, #E8789A" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('productModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveProduct()"><i class="fa-solid fa-floppy-disk"></i> Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CATEGORY MODAL ── -->
+<div class="modal-overlay" id="categoryModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="catModalTitle">Add Category</div>
+      <button class="modal-close" onclick="closeModal('categoryModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editCatId" />
+      <div class="form-group">
+        <label class="form-label">Category Name *</label>
+        <input class="form-input" type="text" id="cName" placeholder="e.g., Sarees" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Slug</label>
+        <input class="form-input" type="text" id="cSlug" placeholder="sarees (auto-generated)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image URL</label>
+        <input class="form-input" type="url" id="cImage" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub-Categories (comma-separated)</label>
+        <input class="form-input" type="text" id="cSubs" placeholder="Silk Sarees, Cotton Sarees, Banarasi..." />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('categoryModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveCategory()"><i class="fa-solid fa-floppy-disk"></i> Save Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BANNER MODAL ── -->
+<div class="modal-overlay" id="bannerModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title">Add / Edit Banner</div>
+      <button class="modal-close" onclick="closeModal('bannerModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editBannerId" />
+      <div class="form-group"><label class="form-label">Banner Title</label><input class="form-input" id="bTitle" type="text" placeholder="Summer Collection 2024" /></div>
+      <div class="form-group"><label class="form-label">Image URL</label><input class="form-input" id="bImage" type="url" placeholder="https://..." /></div>
+      <div class="form-group"><label class="form-label">Link (optional)</label><input class="form-input" id="bLink" type="text" placeholder="/shop?cat=sarees" /></div>
+      <div class="form-group"><label class="form-label">Position</label><select class="form-select" id="bPosition"><option value="hero">Hero Banner</option><option value="mid">Mid-page Banner</option><option value="bottom">Bottom Banner</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('bannerModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveBanner()"><i class="fa-solid fa-floppy-disk"></i> Save Banner</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── COUPON MODAL ── -->
+<div class="modal-overlay" id="couponModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">Create Coupon</div>
+      <button class="modal-close" onclick="closeModal('couponModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Coupon Code *</label><input class="form-input" id="couCode" type="text" placeholder="VIVIDHA10" style="text-transform:uppercase;" /></div>
+        <div class="form-group"><label class="form-label">Discount %</label><input class="form-input" id="couDiscount" type="number" placeholder="10" min="1" max="100" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Min Order (₹)</label><input class="form-input" id="couMin" type="number" placeholder="500" /></div>
+        <div class="form-group"><label class="form-label">Max Uses</label><input class="form-input" id="couMax" type="number" placeholder="100" /></div>
+      </div>
+      <div class="form-group"><label class="form-label">Expires On</label><input class="form-input" id="couExpiry" type="date" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('couponModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveCoupon()"><i class="fa-solid fa-floppy-disk"></i> Create Coupon</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORDER STATUS MODAL ── -->
+<div class="modal-overlay" id="orderStatusModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><div class="modal-title">Update Order Status</div><button class="modal-close" onclick="closeModal('orderStatusModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editOrderId" />
+      <div class="form-group"><label class="form-label">Order Status</label>
+        <select class="form-select" id="orderStatusSelect">
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('orderStatusModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="updateOrderStatus()">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
+
+<script src="admin.js"></script>
+</body>
+</html>
