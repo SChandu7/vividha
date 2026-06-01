@@ -166,8 +166,8 @@ async function loadAllData() {
 await safeLoad('/products/',   r => { admin.products = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_products')||'null') || []); });
 await safeLoad('/orders/',     r => { admin.orders = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_orders')||'null') || []); });
 await safeLoad('/customers/',  r => { admin.customers = r && r.length ? r : []; });
-  admin.banners  = [];
-admin.coupons  = [];
+  await safeLoad('/banners/', r => { admin.banners = r && r.length ? r : []; });
+await safeLoad('/coupons/', r => { admin.coupons = r && r.length ? r : []; });
   admin.filteredProducts = [...admin.products];
   admin.filteredOrders   = [...admin.orders];
 
