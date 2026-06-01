@@ -81,20 +81,16 @@ async function loadData() {
     await loadCategories();
     await loadProducts();
   } catch (e) {
-    console.warn('API unavailable, using demo data:', e.message);
-    state.categories = DEMO_CATEGORIES;
-    state.products = DEMO_PRODUCTS;
+    console.warn('API unavailable:', e.message);
+    state.categories = [];
+    state.products = [];
     renderAll();
   }
 }
 
 async function loadCategories() {
   const res = await fetchAPI('/categories/', 'GET');
-  if (res && res.length) {
-    state.categories = res;
-  } else {
-    state.categories = DEMO_CATEGORIES;
-  }
+  state.categories = (res && res.length) ? res : [];
   renderCategoryNav();
   renderCategoryDropdown();
   renderCategoryGrid();
@@ -111,6 +107,10 @@ async function loadProducts() {
     const adminSaved = JSON.parse(localStorage.getItem('vividha_admin_products') || 'null');
     state.products = adminSaved && adminSaved.length ? adminSaved : [];
   }
+  state.filteredProducts = [...state.products];
+  renderHomeProducts();
+  renderShopProducts();
+}
 
 function renderAll() {
   renderCategoryNav();
