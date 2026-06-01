@@ -8,7 +8,7 @@ const API = 'https://api.chandus7.in/api/fashion';
 
 // ── HARDCODED ADMIN CREDENTIALS ───────────────────────────────
 const ADMIN_EMAIL    = 'admin@vividha.in';
-const ADMIN_PASSWORD = 'Vividha@Admin2024';
+const ADMIN_PASSWORD = 'admin@123';
 
 // ── STATE ──────────────────────────────────────────────────────
 let admin = {
