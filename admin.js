@@ -163,8 +163,8 @@ async function fetchAPI(endpoint, method = 'GET', body = null) {
 async function loadAllData() {
   // Try API; fall back to demo data for each resource
   await safeLoad('/categories/', r => { admin.categories = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_categories')||'null') || DEMO_CATEGORIES); });
-  await safeLoad('/products/',   r => { admin.products = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_products')||'null') || DEMO_PRODUCTS); });
-  await safeLoad('/orders/',     r => { admin.orders = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_orders')||'null') || DEMO_ORDERS); });
+await safeLoad('/products/', r => { admin.products = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_products')||'null') || []); });
+   await safeLoad('/orders/',     r => { admin.orders = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_orders')||'null') || DEMO_ORDERS); });
   await safeLoad('/customers/',  r => { admin.customers = r && r.length ? r : DEMO_CUSTOMERS; });
   admin.banners  = DEMO_BANNERS;
   admin.coupons  = DEMO_COUPONS;
