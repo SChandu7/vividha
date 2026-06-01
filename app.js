@@ -108,14 +108,9 @@ async function loadProducts() {
   if (res && res.length) {
     state.products = res;
   } else {
-    // Check admin localStorage first, then fall back to demo
     const adminSaved = JSON.parse(localStorage.getItem('vividha_admin_products') || 'null');
-    state.products = adminSaved && adminSaved.length ? adminSaved : DEMO_PRODUCTS;
+    state.products = adminSaved && adminSaved.length ? adminSaved : [];
   }
-  state.filteredProducts = [...state.products];
-  renderHomeProducts();
-  renderShopProducts();
-}
 
 function renderAll() {
   renderCategoryNav();
