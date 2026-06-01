@@ -149,7 +149,7 @@ function showApp() {
 // ── API HELPER ────────────────────────────────────────────────
 async function fetchAPI(endpoint, method = 'GET', body = null) {
   const headers = { 'Content-Type': 'application/json' };
-  if (admin.token && admin.token !== 'demo-admin-token') {
+  if (admin.token) {
     headers['Authorization'] = `Token ${admin.token}`;
   }
   const opts = { method, headers };
