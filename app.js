@@ -195,6 +195,248 @@ function renderMobileCategoryLinks() {
   `).join('');
 }
 
+// ── PROFILE PANEL ─────────────────────────────────────────────
+function openProfile() {
+  if (!state.user) { openModal('loginModal'); return; }
+  // Fill header
+  const name = state.user.name || 'User';
+  document.getElementById('profileAvatarLarge').textContent = name[0].toUpperCase();
+  document.getElementById('profileHeaderName').textContent = name;
+  document.getElementById('profileHeaderEmail').textContent = state.user.email || '';
+  // Fill settings
+  document.getElementById('settingsName').value  = state.user.name  || '';
+  document.getElementById('settingsPhone').value = state.user.phone || '';
+  document.getElementById('settingsEmail').value = state.user.email || '';
+  // Open panel
+  document.getElementById('profilePanel').classList.add('open');
+  document.getElementById('profileOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Load orders
+  loadMyOrders();
+  // Load wishlist
+  renderProfileWishlist();
+}
+
+function closeProfile() {
+  document.getElementById('profilePanel').classList.remove('open');
+  document.getElementById('profileOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchProfileTab(tab, el) {
+  document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.profile-tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('profileTab-' + tab).classList.add('active');
+}
+
+// ── MY ORDERS ─────────────────────────────────────────────────
+async function loadMyOrders() {
+  const list = document.getElementById('profileOrdersList');
+  list.innerHTML = '<div class="profile-loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</div>';
+  try {
+    const orders = await fetchAPI('/orders/my/', 'GET');
+    if (!orders || !orders.length) {
+      list.innerHTML = `
+        <div class="profile-empty">
+          <div class="profile-empty-icon">📦</div>
+          <p>No orders yet</p>
+          <span>Your orders will appear here</span>
+        </div>`;
+      return;
+    }
+    list.innerHTML = orders.map(o => {
+      const itemsHtml = (o.items || []).map(i => `
+        <div class="order-item-row">
+          <div style="flex:1; font-weight:500;">${i.name}</div>
+          <div style="color:var(--text-muted);">×${i.qty}</div>
+          <div style="font-weight:600; color:var(--navy);">₹${(i.price * i.qty).toLocaleString()}</div>
+        </div>
+      `).join('');
+
+      const statusColor = {
+        pending: '#F39C12', confirmed: '#A8872E',
+        shipped: '#1565C0', delivered: '#27AE60', cancelled: '#E74C3C'
+      };
+      const payColor = { paid: '#27AE60', pending: '#F39C12', failed: '#E74C3C' };
+      const date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—';
+
+      return `
+        <div class="order-card">
+          <div class="order-card-header" onclick="toggleOrderCard(this)">
+            <div>
+              <div class="order-card-no">${o.order_no}</div>
+              <div class="order-card-date">${date} · ${(o.items||[]).length} item(s)</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="order-card-total">₹${parseFloat(o.total_amount||0).toLocaleString()}</div>
+              <div style="display:flex; gap:6px; margin-top:4px; justify-content:flex-end;">
+                <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${statusColor[o.status]||'#999'}22; color:${statusColor[o.status]||'#999'}; text-transform:uppercase;">${o.status}</span>
+                <span style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:${payColor[o.payment_status]||'#999'}22; color:${payColor[o.payment_status]||'#999'}; text-transform:uppercase;">${o.payment_status}</span>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-down" style="color:var(--text-muted); font-size:12px; margin-left:4px;"></i>
+          </div>
+          <div class="order-card-body">
+            ${itemsHtml}
+            <div class="order-address">
+              <i class="fa-solid fa-location-dot" style="color:var(--gold-dark); margin-right:4px;"></i>
+              ${o.delivery_address}, ${o.city} — ${o.pincode}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="profile-loading" style="color:var(--pink);">Failed to load orders. Please try again.</div>';
+  }
+}
+
+function toggleOrderCard(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('i.fa-chevron-down');
+  body.classList.toggle('open');
+  if (icon) icon.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+// ── PROFILE WISHLIST ──────────────────────────────────────────
+function renderProfileWishlist() {
+  const grid = document.getElementById('profileWishlistGrid');
+  if (!grid) return;
+  const items = state.products.filter(p => state.wishlist.includes(p.id));
+  if (!items.length) {
+    grid.innerHTML = `
+      <div class="profile-empty">
+        <div class="profile-empty-icon">♡</div>
+        <p>Wishlist is empty</p>
+        <span>Save items you love</span>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = `<div class="profile-wishlist-grid">` + items.map(p => `
+    <div class="profile-wish-card" onclick="openProductDetail(${p.id}); closeProfile()">
+      <img src="${p.image || ''}" alt="${p.name}" loading="lazy" />
+      <div class="profile-wish-info">
+        <div class="profile-wish-name">${p.name}</div>
+        <div class="profile-wish-price">₹${p.price.toLocaleString()}</div>
+        <div class="profile-wish-remove" onclick="event.stopPropagation(); toggleWishlist(${p.id}); renderProfileWishlist()">
+          <i class="fa-solid fa-heart-crack"></i> Remove
+        </div>
+      </div>
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ── SAVE PROFILE ──────────────────────────────────────────────
+async function saveProfile() {
+  const name  = document.getElementById('settingsName').value.trim();
+  const phone = document.getElementById('settingsPhone').value.trim();
+  if (!name) { showToast('Name cannot be empty', 'error'); return; }
+  try {
+    const updated = await fetchAPI('/auth/profile/', 'PATCH', { name, phone });
+    if (updated && updated.name) {
+      state.user.name  = updated.name;
+      state.user.phone = updated.phone || '';
+      localStorage.setItem('vividha_user', JSON.stringify(state.user));
+      document.getElementById('profileHeaderName').textContent = updated.name;
+      document.getElementById('profileAvatarLarge').textContent = updated.name[0].toUpperCase();
+      updateAuthUI();
+      showToast('Profile updated successfully ✓', 'success');
+    }
+  } catch(e) {
+    showToast('Failed to update profile', 'error');
+  }
+}
+
+// ── CHANGE PASSWORD ───────────────────────────────────────────
+async function changePassword() {
+  const oldPass = document.getElementById('settingsOldPass').value;
+  const newPass = document.getElementById('settingsNewPass').value;
+  const errEl   = document.getElementById('settingsPassError');
+  errEl.style.display = 'none';
+
+  if (!oldPass || !newPass) {
+    errEl.textContent = 'Please fill both password fields.';
+    errEl.style.display = 'block'; return;
+  }
+  if (newPass.length < 8) {
+    errEl.textContent = 'New password must be at least 8 characters.';
+    errEl.style.display = 'block'; return;
+  }
+  try {
+    await fetchAPI('/auth/change-password/', 'POST', {
+      old_password: oldPass, new_password: newPass
+    });
+    document.getElementById('settingsOldPass').value = '';
+    document.getElementById('settingsNewPass').value = '';
+    showToast('Password changed successfully ✓', 'success');
+  } catch(e) {
+    errEl.textContent = 'Current password is incorrect.';
+    errEl.style.display = 'block';
+  }
+}
+
+// ── TRACK ORDER ───────────────────────────────────────────────
+async function trackOrder() {
+  const orderNo = document.getElementById('trackOrderInput').value.trim().toUpperCase();
+  const result  = document.getElementById('trackOrderResult');
+  if (!orderNo) { result.innerHTML = '<div style="color:var(--pink);font-size:13px;">Please enter an order number.</div>'; return; }
+
+  result.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">Searching...</div>';
+
+  try {
+    const orders = await fetchAPI('/orders/my/', 'GET');
+    const order  = orders?.find(o => o.order_no === orderNo);
+    if (!order) {
+      result.innerHTML = '<div style="color:var(--pink);font-size:13px;">Order not found. Please check the order number.</div>';
+      return;
+    }
+    const steps = ['pending','confirmed','shipped','delivered'];
+    const idx   = steps.indexOf(order.status);
+    const stepsHtml = steps.map((s, i) => `
+      <div style="display:flex; align-items:center; gap:10px; padding:8px 0;">
+        <div style="width:24px; height:24px; border-radius:50%; background:${i<=idx?'var(--navy)':'var(--border)'}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <i class="fa-solid fa-check" style="color:white; font-size:10px; opacity:${i<=idx?1:0};"></i>
+        </div>
+        <span style="font-size:13px; font-weight:${i===idx?600:400}; color:${i<=idx?'var(--navy)':'var(--text-light)'}; text-transform:capitalize;">${s}</span>
+        ${i===idx?'<span style="font-size:10px; background:var(--gold-pale); color:var(--gold-dark); padding:2px 8px; border-radius:20px; font-weight:600;">Current</span>':''}
+      </div>
+    `).join('');
+    result.innerHTML = `
+      <div style="background:var(--ivory); border-radius:var(--r-md); padding:16px; margin-top:8px;">
+        <div style="font-size:13px; font-weight:600; color:var(--navy); margin-bottom:12px;">Order ${order.order_no}</div>
+        ${stepsHtml}
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:12px; color:var(--text-muted);">
+          Total: ₹${parseFloat(order.total_amount||0).toLocaleString()} · Payment: ${order.payment_status}
+        </div>
+      </div>`;
+  } catch(e) {
+    result.innerHTML = '<div style="color:var(--pink);font-size:13px;">Please login to track your order.</div>';
+  }
+}
+
+// ── CONTACT FORM ──────────────────────────────────────────────
+function submitContact() {
+  const name    = document.getElementById('contactName').value.trim();
+  const email   = document.getElementById('contactEmail').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  if (!name || !email || !message) {
+    showToast('Please fill all fields', 'error'); return;
+  }
+  // In production connect to email API
+  showToast(`Message sent! We'll reply to ${email} within 24hrs ✓`, 'success');
+  document.getElementById('contactName').value    = '';
+  document.getElementById('contactEmail').value   = '';
+  document.getElementById('contactMessage').value = '';
+  closeModal('contactModal');
+}
+
+// ── FAQ TOGGLE ────────────────────────────────────────────────
+function toggleFaq(el) {
+  const answer = el.nextElementSibling;
+  el.classList.toggle('open');
+  answer.classList.toggle('open');
+}
+
 function renderCategoryNav() {} // handled by dropdown
 
 // ── RENDER: PRODUCTS ──────────────────────────────────────────
