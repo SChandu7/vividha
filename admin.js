@@ -224,8 +224,8 @@ function globalSearch(q) {
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard() {
   const todayOrders  = admin.orders.filter(o => o.status !== 'cancelled').length;
-  const revenue      = admin.orders.filter(o => o.payment === 'paid').reduce((s, o) => s + (o.total||0), 0);
-  const pendingCount = admin.orders.filter(o => o.status === 'pending').length;
+const revenue = admin.orders.filter(o => o.payment_status === 'paid').reduce((s, o) => s + parseFloat(o.total_amount||0), 0);
+const pendingCount = admin.orders.filter(o => o.status === 'pending').length;
   const lowStockN    = admin.products.filter(p => p.stock <= 5).length;
 
   setText('statOrders',    todayOrders);
@@ -240,11 +240,11 @@ function renderDashboard() {
 
   const body = document.getElementById('recentOrdersBody');
   if (body) {
-    body.innerHTML = admin.orders.slice(0, 6).map(o => `
+body.innerHTML = admin.orders.slice(0, 6).map(o => `
       <tr>
         <td class="td-name">${o.order_no}</td>
-        <td>${o.customer || '—'}</td>
-        <td class="td-price">₹${(o.total||0).toLocaleString()}</td>
+  <td>${o.customer_name || '—'}</td>
+  <td class="td-price">₹${(o.total_amount||0).toLocaleString()}</t
         <td><span class="payment-tag ${o.payment||'pending'}">${(o.payment||'PENDING').toUpperCase()}</span></td>
         <td><span class="order-status ${o.status}">${o.status}</span></td>
         <td>${o.date||'—'}</td>
@@ -639,11 +639,11 @@ function renderOrders(statusFilter, list) {
     <tr>
       <td class="td-name">${o.order_no}</td>
       <td>
-        <div style="font-weight:500;">${o.customer||'—'}</div>
-        <div style="font-size:11px;color:var(--text-muted);">${o.email||''}</div>
-      </td>
-      <td>${o.items||0} item${(o.items||0)!==1?'s':''}</td>
-      <td class="td-price">₹${(o.total||0).toLocaleString()}</td>
+       <div style="font-weight:500;">${o.customer_name||'—'}</div>
+<div style="font-size:11px;color:var(--text-muted);">${o.customer_email||''}</div>
+</td>
+<td>${o.items ? o.items.length : 0} item${(o.items ? o.items.length : 0)!==1?'s':''}</td>
+<td class="td-price">₹${(o.total_amount||0).toLocaleString()}</td>
       <td><span class="payment-tag ${o.payment||'pending'}">${(o.payment||'PENDING').toUpperCase()}</span></td>
       <td><span class="order-status ${o.status}">${o.status}</span></td>
       <td>${o.date||'—'}</td>
