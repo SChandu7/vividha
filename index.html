@@ -55,7 +55,7 @@
       </button>
       <button class="btn-login" id="loginBtn">Login</button>
       <button class="btn-join" id="joinBtn">Join</button>
-      <div class="nav-icon-btn" id="userAvatarBtn" style="display:none; background:var(--navy); color:white; font-weight:600; font-size:14px; cursor:pointer;"></div>
+<div class="nav-icon-btn" id="userAvatarBtn" style="display:none; background:var(--navy); color:white; font-weight:600; font-size:14px; cursor:pointer;" onclick="openProfile()"></div>
     </div>
   </div>
 
@@ -474,11 +474,11 @@
     <div class="footer-col">
       <h4>Help</h4>
       <ul>
-        <li><a href="#">Shipping Info</a></li>
-        <li><a href="#">Returns Policy</a></li>
-        <li><a href="#">Track Order</a></li>
-        <li><a href="#">FAQs</a></li>
-        <li><a href="#">Contact Us</a></li>
+       <li><a href="#" onclick="openModal('helpModal');return false;">Shipping Info</a></li>
+<li><a href="#" onclick="openModal('helpModal');return false;">Returns Policy</a></li>
+<li><a href="#" onclick="openModal('helpModal');return false;">Track Order</a></li>
+<li><a href="#" onclick="openModal('helpModal');return false;">FAQs</a></li>
+<li><a href="#" onclick="openModal('contactModal');return false;">Contact Us</a></li>
       </ul>
     </div>
   </div>
@@ -495,6 +495,247 @@
   </div>
 </footer>
 
+<!-- ══ USER PROFILE PANEL ══ -->
+<div class="cart-overlay" id="profileOverlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profilePanel">
+  <div class="profile-panel-header">
+    <div class="profile-avatar-large" id="profileAvatarLarge">P</div>
+    <div class="profile-header-info">
+      <div class="profile-header-name" id="profileHeaderName">Priya Sharma</div>
+      <div class="profile-header-email" id="profileHeaderEmail">priya@email.com</div>
+    </div>
+    <button onclick="closeProfile()" class="profile-close-btn">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="profile-tabs">
+    <button class="profile-tab active" onclick="switchProfileTab('orders', this)">
+      <i class="fa-solid fa-box"></i> Orders
+    </button>
+    <button class="profile-tab" onclick="switchProfileTab('wishlist', this)">
+      <i class="fa-regular fa-heart"></i> Wishlist
+    </button>
+    <button class="profile-tab" onclick="switchProfileTab('settings', this)">
+      <i class="fa-solid fa-gear"></i> Settings
+    </button>
+  </div>
+
+  <!-- Orders Tab -->
+  <div class="profile-tab-content active" id="profileTab-orders">
+    <div id="profileOrdersList">
+      <div class="profile-loading">
+        <i class="fa-solid fa-spinner fa-spin"></i> Loading orders...
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Tab -->
+  <div class="profile-tab-content" id="profileTab-wishlist">
+    <div id="profileWishlistGrid"></div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="profile-tab-content" id="profileTab-settings">
+    <div class="settings-section">
+      <div class="settings-section-title">Personal Info</div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="settingsName" placeholder="Your name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" type="tel" id="settingsPhone" placeholder="+91 98765 43210" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="settingsEmail" disabled style="opacity:0.6;" />
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="saveProfile()">
+        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+      </button>
+    </div>
+
+    <div class="settings-section" style="margin-top:24px;">
+      <div class="settings-section-title">Change Password</div>
+      <div class="form-group">
+        <label class="form-label">Current Password</label>
+        <input class="form-input" type="password" id="settingsOldPass" placeholder="••••••••" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input class="form-input" type="password" id="settingsNewPass" placeholder="Min. 8 characters" />
+      </div>
+      <div class="form-error" id="settingsPassError"></div>
+      <button class="btn btn-outline" style="width:100%; justify-content:center;" onclick="changePassword()">
+        <i class="fa-solid fa-lock"></i> Update Password
+      </button>
+    </div>
+
+    <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border);">
+      <button class="btn" style="width:100%; justify-content:center; background:#FFF0F0; color:#C0392B; border:1.5px solid #FFD0D0;" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HELP MODAL ══ -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('helpModal')">✕</button>
+    <div style="padding:40px;">
+      <div style="font-family:var(--font-display); font-size:28px; font-weight:500; margin-bottom:24px;">Help & Support</div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>📦 What is your shipping policy?</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">Free shipping on all orders above ₹999. Standard delivery takes 5-7 business days. Express delivery available at checkout.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>🔄 What is your return policy?</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">Easy 7-day returns on all products. Item must be unused and in original packaging. Refund processed within 3-5 business days.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>🔍 How do I track my order?</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">Enter your order number in the Track Order section below. You'll receive SMS updates at every stage of your delivery.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>💳 What payment methods do you accept?</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">We accept UPI, Credit/Debit cards, Net Banking, and Wallets via Razorpay. All payments are 100% secure and encrypted.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>📏 How do I find the right size?</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">Each product page has a detailed size guide. For sarees, one size fits all. For stitched items, refer to the measurements chart on the product page.</div>
+      </div>
+
+      <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border);">
+        <div style="font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px;">Track Your Order</div>
+        <div style="display:flex; gap:10px;">
+          <input class="form-input" type="text" id="trackOrderInput" placeholder="Enter order number e.g. VIV20260605" style="flex:1;" />
+          <button class="btn btn-navy btn-sm" onclick="trackOrder()">Track</button>
+        </div>
+        <div id="trackOrderResult" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABOUT MODAL ══ -->
+<div class="modal-overlay" id="aboutModal">
+  <div class="modal" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('aboutModal')">✕</button>
+    <div style="padding:40px;">
+      <div style="font-family:var(--font-display); font-size:32px; font-weight:400; margin-bottom:6px;">
+        About <em style="color:var(--pink);">विVIDHA</em>
+      </div>
+      <div style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-dark); margin-bottom:24px;">EST. 2024 · INDIA'S FINEST WOMEN'S FASHION</div>
+      <p style="font-size:14px; color:var(--text-muted); line-height:1.8; margin-bottom:20px;">
+        विVIDHA was born from a simple belief — every woman deserves to wear art. We curate India's most exquisite ethnic and fusion wear, handpicked from master weavers and artisan workshops across the country.
+      </p>
+      <p style="font-size:14px; color:var(--text-muted); line-height:1.8; margin-bottom:28px;">
+        From the silk looms of Kanjivaram to the embroidery ateliers of Kashmir, every piece in our collection tells a story of centuries-old craftsmanship meeting contemporary design.
+      </p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px;">
+        <div style="background:var(--ivory-deep); border-radius:12px; padding:20px; text-align:center;">
+          <div style="font-family:var(--font-display); font-size:32px; font-weight:600; color:var(--navy);">500<sup style="font-size:16px; color:var(--gold);">+</sup></div>
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Curated Styles</div>
+        </div>
+        <div style="background:var(--ivory-deep); border-radius:12px; padding:20px; text-align:center;">
+          <div style="font-family:var(--font-display); font-size:32px; font-weight:600; color:var(--navy);">50K<sup style="font-size:16px; color:var(--gold);">+</sup></div>
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Happy Customers</div>
+        </div>
+        <div style="background:var(--ivory-deep); border-radius:12px; padding:20px; text-align:center;">
+          <div style="font-family:var(--font-display); font-size:32px; font-weight:600; color:var(--navy);">12<sup style="font-size:16px; color:var(--gold);">+</sup></div>
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Collections</div>
+        </div>
+        <div style="background:var(--ivory-deep); border-radius:12px; padding:20px; text-align:center;">
+          <div style="font-family:var(--font-display); font-size:32px; font-weight:600; color:var(--navy);">4.9<sup style="font-size:16px; color:var(--gold);">★</sup></div>
+          <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Rating</div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg, var(--navy), var(--navy-mid)); border-radius:12px; padding:20px; color:white; text-align:center;">
+        <div style="font-family:var(--font-display); font-size:20px; font-weight:400; margin-bottom:8px; font-style:italic;">हर धागे में खूबसूरती</div>
+        <div style="font-size:12px; opacity:0.7;">Beauty in Every Thread</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTACT MODAL ══ -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal" style="max-width:520px;">
+    <button class="modal-close" onclick="closeModal('contactModal')">✕</button>
+    <div style="padding:40px;">
+      <div style="font-family:var(--font-display); font-size:28px; font-weight:500; margin-bottom:6px;">Contact Us</div>
+      <div style="font-size:13px; color:var(--text-muted); margin-bottom:28px;">We'd love to hear from you!</div>
+
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" type="text" id="contactName" placeholder="Priya Sharma" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="contactEmail" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-input" id="contactMessage" rows="4" placeholder="Tell us how we can help you..." style="resize:vertical;"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center; margin-bottom:24px;" onclick="submitContact()">
+        <i class="fa-solid fa-paper-plane"></i> Send Message
+      </button>
+
+      <div style="border-top:1px solid var(--border); padding-top:24px;">
+        <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:16px; font-weight:600;">Or Reach Us Directly</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="https://wa.me/919949597079" target="_blank" class="contact-direct-btn whatsapp">
+            <i class="fa-brands fa-whatsapp"></i>
+            <div>
+              <div style="font-weight:600; font-size:14px;">Chat on WhatsApp</div>
+              <div style="font-size:12px; opacity:0.8;">+91 99495 97079 · Instant reply</div>
+            </div>
+            <i class="fa-solid fa-arrow-right" style="margin-left:auto; opacity:0.6;"></i>
+          </a>
+          <a href="mailto:support@vividha.in" class="contact-direct-btn email">
+            <i class="fa-solid fa-envelope"></i>
+            <div>
+              <div style="font-weight:600; font-size:14px;">Email Us</div>
+              <div style="font-size:12px; opacity:0.8;">support@vividha.in · Reply in 24hrs</div>
+            </div>
+            <i class="fa-solid fa-arrow-right" style="margin-left:auto; opacity:0.6;"></i>
+          </a>
+          <a href="https://instagram.com/vividha.in" target="_blank" class="contact-direct-btn instagram">
+            <i class="fa-brands fa-instagram"></i>
+            <div>
+              <div style="font-weight:600; font-size:14px;">Instagram</div>
+              <div style="font-size:12px; opacity:0.8;">@vividha.in · DM us anytime</div>
+            </div>
+            <i class="fa-solid fa-arrow-right" style="margin-left:auto; opacity:0.6;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
 <script src="app.js"></script>
+
+  
 </body>
 </html>
