@@ -880,9 +880,7 @@ function updateAuthUI() {
     if (avatarBtn) {
       avatarBtn.style.display = 'flex';
       avatarBtn.textContent = (state.user.name || 'U')[0].toUpperCase();
-      avatarBtn.onclick = () => {
-        if (confirm(`Signed in as ${state.user.email}\nSign out?`)) logout();
-      };
+      avatarBtn.onclick = () => openProfile();
     }
   } else {
     if (loginBtn) loginBtn.style.display = '';
