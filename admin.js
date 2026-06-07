@@ -513,17 +513,39 @@ function previewImageUrl(url) {
   }
 }
 
-function handleImageUpload(input) {
+async function handleImageUpload(input) {
   const file = input.files[0];
   if (!file) return;
+
+  // Show preview immediately
   const reader = new FileReader();
   reader.onload = e => {
     const img = document.getElementById('pImagePreview');
     if (img) { img.src = e.target.result; img.style.display = 'block'; }
-    // In production, upload to S3 here and set the URL
-    showToast('Image selected — will upload to S3 on save.', 'success');
   };
   reader.readAsDataURL(file);
+
+  // Upload to backend → S3
+  showToast('Uploading image...', 'success');
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const res = await fetch('https://api.chandus7.in/api/fashion/upload/', {
+      method: 'POST',
+      headers: { 'Authorization': `Token ${admin.token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    if (data && data.url) {
+      document.getElementById('pImageUrl').value = data.url;
+      showToast('Image uploaded ✓', 'success');
+    } else {
+      showToast('Upload failed — use URL instead', 'error');
+    }
+  } catch(e) {
+    showToast('Upload failed — use URL instead', 'error');
+  }
 }
 
 function generateSKU(name) {
