@@ -137,14 +137,14 @@ body::before {
 }
 .logo-deva {
   font-family: var(--font-deva);
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--navy);
   letter-spacing: 0.5px;
 }
 .logo-deva span.vi { color: var(--navy); }
 .logo-deva span.vidha { color: var(--gold); }
-.logo-deva span.vi-hi { color: var(--gold-dark); }
+.logo-deva span.vi-hi { color: var(--navy); }
 .logo-sub {
   font-family: var(--font-body);
   font-size: 9px;
