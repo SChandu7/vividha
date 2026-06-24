@@ -279,10 +279,14 @@ async function loadMyOrders() {
           </div>
           <div class="order-card-body">
             ${itemsHtml}
-            <div class="order-address">
-              <i class="fa-solid fa-location-dot" style="color:var(--gold-dark); margin-right:4px;"></i>
-              ${o.delivery_address}, ${o.city} — ${o.pincode}
-            </div>
+           <div class="order-address">
+  <i class="fa-solid fa-location-dot" style="color:var(--gold-dark); margin-right:4px;"></i>
+  ${o.delivery_address}, ${o.city} — ${o.pincode}
+</div>
+${o.payment_status === 'paid' ? `
+  <button onclick="openInvoice(${o.id})" style="margin-top:12px; width:100%; padding:10px; background:linear-gradient(135deg,#1B2A4A,#2D4070); color:white; border-radius:8px; font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border:none;">
+    <i class="fa-solid fa-file-invoice"></i> View / Download Invoice
+  </button>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -911,8 +915,20 @@ function openCheckout() {
   }
   closeCart();
   const total = state.cart.reduce((s,i) => s + i.price * i.qty, 0);
-  document.getElementById('coSubtotal').textContent = `₹${total.toLocaleString()}`;
-  document.getElementById('coTotal').textContent = `₹${total.toLocaleString()}`;
+ const gstRate  = total <= 1000 ? 5 : 12;
+const cgst     = Math.round(total * (gstRate/2) / 100 * 100) / 100;
+const sgst     = Math.round(total * (gstRate/2) / 100 * 100) / 100;
+const finalTotal = Math.round((total + cgst + sgst) * 100) / 100;
+
+document.getElementById('coSubtotal').textContent  = `₹${total.toLocaleString()}`;
+document.getElementById('coCgstRate').textContent   = (gstRate/2).toFixed(1);
+document.getElementById('coSgstRate').textContent   = (gstRate/2).toFixed(1);
+document.getElementById('coCgst').textContent       = `₹${cgst.toLocaleString()}`;
+document.getElementById('coSgst').textContent       = `₹${sgst.toLocaleString()}`;
+document.getElementById('coTotal').textContent      = `₹${finalTotal.toLocaleString()}`;
+
+// Store for Razorpay
+state.checkoutFinalTotal = finalTotal;
   document.getElementById('coName').value = state.user.name || '';
   const listEl = document.getElementById('checkoutItemsList');
   if (listEl) {
@@ -953,7 +969,7 @@ async function initiateRazorpay() {
 
     const options = {
 key: 'rzp_live_SBfHnaNXR06cuM',
-      amount: total * 100, // in paise
+    amount: Math.round((state.checkoutFinalTotal || total) * 100),
       currency: 'INR',
       name: 'विVIDHA',
       description: 'Premium Women\'s Fashion',
@@ -994,6 +1010,159 @@ function loadScript(src) {
     s.onerror = rej;
     document.head.appendChild(s);
   });
+}
+
+// ── INVOICE ───────────────────────────────────────────────────
+async function openInvoice(orderId) {
+  document.getElementById('invoiceContent').innerHTML = `
+    <div style="text-align:center; padding:40px; color:var(--text-muted);">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;"></i>
+      <div style="margin-top:12px;">Loading invoice...</div>
+    </div>`;
+  openModal('invoiceModal');
+  try {
+    const inv = await fetchAPI(`/orders/${orderId}/invoice/`, 'GET');
+    renderInvoice(inv);
+  } catch(e) {
+    document.getElementById('invoiceContent').innerHTML = `
+      <div style="text-align:center; padding:40px; color:var(--pink);">Failed to load invoice.</div>`;
+  }
+}
+
+function renderInvoice(inv) {
+  const itemsHtml = inv.items.map((item, i) => `
+    <tr style="border-bottom:1px solid #E8E0D0;">
+      <td style="padding:10px 8px;">${i+1}</td>
+      <td style="padding:10px 8px; font-weight:500;">${item.name}</td>
+      <td style="padding:10px 8px; text-align:center; color:#6B6B6B;">5208</td>
+      <td style="padding:10px 8px; text-align:center;">${item.qty}</td>
+      <td style="padding:10px 8px; text-align:right;">₹${item.rate.toLocaleString()}</td>
+      <td style="padding:10px 8px; text-align:right; color:#6B6B6B;">₹${item.cgst.toLocaleString()}</td>
+      <td style="padding:10px 8px; text-align:right; color:#6B6B6B;">₹${item.sgst.toLocaleString()}</td>
+      <td style="padding:10px 8px; text-align:right; font-weight:600;">₹${item.total.toLocaleString()}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('invoiceContent').innerHTML = `
+    <div id="invoicePrintArea">
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; padding-bottom:20px; border-bottom:2px solid #1B2A4A;">
+        <div>
+          <div style="font-family:'Noto Sans Devanagari',sans-serif; font-size:28px; font-weight:700; color:#1B2A4A;">
+            वि<span style="color:#C9A84C;">VIDHA</span>
+          </div>
+          <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:#6B6B6B; margin-top:2px;">Premium Women's Fashion</div>
+          <div style="font-size:12px; color:#6B6B6B; margin-top:8px; line-height:1.6;">
+            ${inv.business_address}<br/>
+            GSTIN: ${inv.gstin}<br/>
+            support@vividha.in
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:22px; font-weight:700; color:#1B2A4A; letter-spacing:1px;">TAX INVOICE</div>
+          <div style="margin-top:10px; font-size:13px; line-height:1.8;">
+            <div><span style="color:#6B6B6B;">Invoice No:</span> <strong>${inv.invoice_number}</strong></div>
+            <div><span style="color:#6B6B6B;">Order No:</span> <strong>${inv.order_no}</strong></div>
+            <div><span style="color:#6B6B6B;">Date:</span> <strong>${inv.invoice_date}</strong></div>
+            <div style="margin-top:6px;">
+              <span style="background:${inv.payment_status==='paid'?'#E8F5E9':'#FFF3E0'}; color:${inv.payment_status==='paid'?'#27AE60':'#F39C12'}; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase;">${inv.payment_status}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bill To -->
+      <div style="background:#FAF8F3; border-radius:10px; padding:16px 20px; margin-bottom:24px;">
+        <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#A8872E; font-weight:600; margin-bottom:8px;">Bill To</div>
+        <div style="font-size:15px; font-weight:600; color:#1B2A4A; margin-bottom:4px;">${inv.customer_name}</div>
+        <div style="font-size:13px; color:#6B6B6B; line-height:1.6;">
+          ${inv.delivery_address}, ${inv.city} — ${inv.pincode}<br/>
+          📞 ${inv.customer_phone} &nbsp;·&nbsp; ✉ ${inv.customer_email}
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:20px;">
+        <thead>
+          <tr style="background:#1B2A4A; color:white;">
+            <th style="padding:10px 8px; text-align:left; font-weight:600; font-size:11px;">#</th>
+            <th style="padding:10px 8px; text-align:left; font-weight:600; font-size:11px;">Item</th>
+            <th style="padding:10px 8px; text-align:center; font-weight:600; font-size:11px;">HSN</th>
+            <th style="padding:10px 8px; text-align:center; font-weight:600; font-size:11px;">Qty</th>
+            <th style="padding:10px 8px; text-align:right; font-weight:600; font-size:11px;">Rate</th>
+            <th style="padding:10px 8px; text-align:right; font-weight:600; font-size:11px;">CGST</th>
+            <th style="padding:10px 8px; text-align:right; font-weight:600; font-size:11px;">SGST</th>
+            <th style="padding:10px 8px; text-align:right; font-weight:600; font-size:11px;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+
+      <!-- Totals -->
+      <div style="display:flex; justify-content:flex-end; margin-bottom:24px;">
+        <div style="min-width:280px;">
+          <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #E8E0D0;">
+            <span style="color:#6B6B6B;">Subtotal</span>
+            <span style="font-weight:500;">₹${inv.subtotal.toLocaleString()}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #E8E0D0;">
+            <span style="color:#6B6B6B;">CGST (${inv.gst_rate/2}%)</span>
+            <span>₹${inv.cgst_amount.toLocaleString()}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #E8E0D0;">
+            <span style="color:#6B6B6B;">SGST (${inv.gst_rate/2}%)</span>
+            <span>₹${inv.sgst_amount.toLocaleString()}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #E8E0D0;">
+            <span style="color:#6B6B6B;">Shipping</span>
+            <span style="color:#A8872E; font-weight:600;">FREE</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:12px 0; font-size:18px; font-weight:700; color:#1B2A4A;">
+            <span>Grand Total</span>
+            <span>₹${inv.total_amount.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="border-top:1px solid #E8E0D0; padding-top:20px; display:flex; justify-content:space-between; align-items:flex-end;">
+        <div style="font-size:12px; color:#6B6B6B; line-height:1.8;">
+          <div style="font-weight:600; color:#1B2A4A; margin-bottom:4px;">Terms & Conditions</div>
+          <div>• 7-day return policy on unused items</div>
+          <div>• This is a computer generated invoice</div>
+          <div>• For queries: support@vividha.in</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Noto Sans Devanagari',sans-serif; font-size:18px; font-weight:700; color:#1B2A4A;">वि<span style="color:#C9A84C;">VIDHA</span></div>
+          <div style="width:120px; border-top:1px solid #1B2A4A; margin:24px auto 4px;"></div>
+          <div style="font-size:11px; color:#6B6B6B;">Authorized Signature</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function downloadInvoice() {
+  const printArea = document.getElementById('invoicePrintArea');
+  if (!printArea) return;
+  const w = window.open('', '_blank');
+  w.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Invoice — विVIDHA</title>
+      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'Jost', sans-serif; margin: 40px; color: #1E1E1E; }
+        @media print { body { margin: 20px; } }
+      </style>
+    </head>
+    <body>${printArea.innerHTML}</body>
+    </html>
+  `);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); w.close(); }, 800);
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
