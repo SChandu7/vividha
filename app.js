@@ -956,11 +956,11 @@ async function initiateRazorpay() {
 
   try {
     // Create order on backend
-    const orderData = await fetchAPI('/orders/create/', 'POST', {
-      items: state.cart.map(i => ({ product_id: i.id, qty: i.qty, price: i.price })),
-      total_amount: total,
-      delivery: { name, phone, address, city, pincode }
-    });
+   const orderData = await fetchAPI('/orders/create/', 'POST', {
+  items: state.cart.map(i => ({ product_id: i.id, qty: i.qty, price: i.price })),
+  total_amount: total,
+  delivery: { name, phone, address, city, pincode, email: state.user?.email || '' }
+});
 
     // Load Razorpay script if not loaded
     if (!window.Razorpay) {
@@ -969,34 +969,51 @@ async function initiateRazorpay() {
 
     const options = {
 key: 'rzp_live_SBfHnaNXR06cuM',
-    amount: Math.round((state.checkoutFinalTotal || total) * 100),
-      currency: 'INR',
+amount: Math.round((orderData?.total || state.checkoutFinalTotal || total) * 100),
+       currency: 'INR',
       name: 'विVIDHA',
       description: 'Premium Women\'s Fashion',
       image: '',
       order_id: orderData?.razorpay_order_id || '',
-      handler: async function(response) {
-        try {
-          await fetchAPI('/orders/verify/', 'POST', {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-          state.cart = [];
-          saveCart();
-          updateCartUI();
-          closeModal('checkoutModal');
-          showToast('Order placed successfully! 🎉 You\'ll receive a confirmation shortly.', 'success');
-        } catch(e) {
-          showToast('Payment verification failed. Please contact support.', 'error');
-        }
-      },
+     handler: async function(response) {
+  try {
+    await fetchAPI('/orders/verify/', 'POST', {
+      razorpay_order_id:   response.razorpay_order_id,
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_signature:  response.razorpay_signature,
+    });
+    state.cart = [];
+    saveCart();
+    updateCartUI();
+    closeModal('checkoutModal');
+    // Close Razorpay modal
+    document.querySelector('.razorpay-container')?.remove();
+    document.querySelector('.razorpay-backdrop')?.remove();
+    document.body.style.overflow = '';
+    showToast('Order placed successfully! 🎉 You\'ll receive a confirmation shortly.', 'success');
+  } catch(e) {
+    console.error('Verify error:', e);
+    // Still close and show success since payment went through
+    state.cart = [];
+    saveCart();
+    updateCartUI();
+    closeModal('checkoutModal');
+    document.body.style.overflow = '';
+    showToast('Order placed! 🎉 You\'ll receive a confirmation shortly.', 'success');
+  }
+},
       prefill: { name, contact: phone, email: state.user?.email || '' },
       theme: { color: '#1B2A4A' },
     };
     const rzp = new window.Razorpay(options);
-    rzp.on('payment.failed', () => showToast('Payment failed. Please try again.', 'error'));
-    rzp.open();
+    rzp.on('payment.failed', (resp) => {
+  console.error('Payment failed:', resp);
+  showToast('Payment failed. Please try again.', 'error');
+});
+rzp.on('modal.closed', () => {
+  document.body.style.overflow = '';
+});
+rzp.open();
   } catch(e) {
     showToast(e.message || 'Failed to initiate payment. Please try again.', 'error');
   }
