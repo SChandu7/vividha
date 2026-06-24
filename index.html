@@ -412,17 +412,27 @@
       </div>
       <div class="checkout-section-title" style="margin-top:8px;">Order Summary</div>
       <div id="checkoutItemsList" style="margin-bottom:16px;"></div>
-      <div style="background:var(--ivory-deep); border-radius:var(--r-md); padding:16px; margin-bottom:20px;">
-        <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px;">
-          <span>Subtotal</span><span id="coSubtotal" style="font-weight:600;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px;">
-          <span>Shipping</span><span style="color:var(--gold-dark); font-weight:600;">FREE</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:18px; font-family:var(--font-display); font-weight:600; padding-top:8px; border-top:1px solid var(--border);">
-          <span>Total</span><span id="coTotal" style="color:var(--navy);">₹0</span>
-        </div>
-      </div>
+   <div style="background:var(--ivory-deep); border-radius:var(--r-md); padding:16px; margin-bottom:20px;">
+  <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px;">
+    <span>Subtotal</span><span id="coSubtotal" style="font-weight:600;">₹0</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:var(--text-muted);">
+    <span>CGST (<span id="coCgstRate">2.5</span>%)</span>
+    <span id="coCgst">₹0</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; color:var(--text-muted);">
+    <span>SGST (<span id="coSgstRate">2.5</span>%)</span>
+    <span id="coSgst">₹0</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px;">
+    <span>Shipping</span>
+    <span style="color:var(--gold-dark); font-weight:600;">FREE</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:18px; font-family:var(--font-display); font-weight:600; padding-top:8px; border-top:1px solid var(--border);">
+    <span>Total <span style="font-size:11px; font-family:var(--font-body); color:var(--text-muted); font-weight:400;">(incl. GST)</span></span>
+    <span id="coTotal" style="color:var(--navy);">₹0</span>
+  </div>
+</div>
       <div class="razorpay-info">
         <i class="fa-solid fa-shield-halved" style="color:var(--gold); font-size:20px;"></i>
         <span>Secured by Razorpay — 100% safe & encrypted payment</span>
@@ -729,6 +739,25 @@
           </a>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- ══ INVOICE MODAL ══ -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal" style="max-width:720px;">
+    <button class="modal-close" onclick="closeModal('invoiceModal')">✕</button>
+    <div id="invoiceContent" style="padding:40px;">
+      <!-- Populated by JS -->
+    </div>
+    <div style="padding:0 40px 32px; display:flex; gap:12px;">
+      <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="downloadInvoice()">
+        <i class="fa-solid fa-download"></i> Download PDF
+      </button>
+      <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeModal('invoiceModal')">
+        Close
+      </button>
     </div>
   </div>
 </div>
