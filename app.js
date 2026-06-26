@@ -968,7 +968,7 @@ async function initiateRazorpay() {
     }
 
     const options = {
-key: 'rzp_live_SBfHnaNXR06cuM',
+key: 'rzp_live_T6Ak4iBowLZVGL',
 amount: Math.round((orderData?.total || state.checkoutFinalTotal || total) * 100),
        currency: 'INR',
       name: 'विVIDHA',
