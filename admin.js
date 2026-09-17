@@ -26,64 +26,7 @@ let admin = {
   editingBannerId: null,
 };
 
-// ── DEMO DATA ─────────────────────────────────────────────────
-const DEMO_CATEGORIES = [
-  { id:1, name:'Sarees', slug:'sarees', image:'https://images.unsplash.com/photo-1611811960734-2b1b8b5d17b1?w=400&q=80', count:80, status:'active', sub:['Silk Sarees','Cotton Sarees','Banarasi','Kashmiri','Printed','Georgette'] },
-  { id:2, name:'Kurtis', slug:'kurtis', image:'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=400&q=80', count:120, status:'active', sub:['Straight Kurtis','A-Line','Anarkali','Kaftan','Designer'] },
-  { id:3, name:'Punjabi Suits', slug:'punjabi-suits', image:'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&q=80', count:65, status:'active', sub:[] },
-  { id:4, name:'Lehengas', slug:'lehengas', image:'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=400&q=80', count:45, status:'active', sub:['Bridal','Party Wear','Casual'] },
-  { id:5, name:'Salwar Suits', slug:'salwar-suits', image:'https://images.unsplash.com/photo-1601936374000-e31f2735e972?w=400&q=80', count:70, status:'active', sub:[] },
-  { id:6, name:'Kashmiri Wear', slug:'kashmiri', image:'https://images.unsplash.com/photo-1595039838779-f3780873afdd?w=400&q=80', count:30, status:'active', sub:[] },
-  { id:7, name:'Pakistani Wear', slug:'pakistani', image:'https://images.unsplash.com/photo-1564489563601-c53cfc451e93?w=400&q=80', count:40, status:'active', sub:[] },
-  { id:8, name:'Dresses & Tops', slug:'western', image:'https://images.unsplash.com/photo-1583744946564-b52d01a7b321?w=400&q=80', count:90, status:'active', sub:[] },
-];
 
-const DEMO_PRODUCTS = [
-  { id:1,  name:'Kanjivaram Pure Silk Saree',   category:'Sarees',        sub_category:'Silk Sarees',    brand:'Kanjivaram Heritage', sku:'VIV-SAR-001', price:4999,  original_price:7499,  stock:12,  tag:'hot',  image:'https://images.unsplash.com/photo-1611811960734-2b1b8b5d17b1?w=400&q=80',  description:'Exquisite pure Kanjivaram silk saree with traditional gold zari border. A timeless piece for weddings and celebrations.', fabric:'Pure Silk, Zari',    colors:['#8B0000','#1B2A4A','#2D5A1E'], status:'active' },
-  { id:2,  name:'Banarasi Brocade Lehenga',      category:'Lehengas',      sub_category:'Bridal',         brand:'Royal Banaras',        sku:'VIV-LEH-001', price:2,  original_price:12999, stock:5,   tag:'hot',  image:'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=400&q=80',  description:'Stunning Banarasi brocade lehenga with intricate gold work. Perfect for bridal occasions.', fabric:'Brocade Silk, Net',  colors:['#C9A84C','#E8789A','#1B2A4A'], status:'active' },
-  { id:3,  name:'Floral Anarkali Kurti',          category:'Kurtis',        sub_category:'Anarkali',       brand:'Vividha Studio',       sku:'VIV-KUR-001', price:1299,  original_price:1799,  stock:50,  tag:'new',  image:'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=400&q=80',  description:'Beautiful floral printed Anarkali kurti with gota patti work.', fabric:'Rayon, Cotton',      colors:['#E8789A','#F7F0DC','#4A5E8A'], status:'active' },
-  { id:4,  name:'Embroidered Punjabi Suit',       category:'Punjabi Suits', sub_category:null,             brand:'Punjab Pride',          sku:'VIV-PUN-001', price:2499,  original_price:3499,  stock:25,  tag:'new',  image:'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&q=80',  description:'Hand-embroidered Punjabi suit with phulkari dupatta.', fabric:'Cotton, Chiffon',    colors:['#C9A84C','#E8789A','#2D5A1E'], status:'active' },
-  { id:5,  name:'Kashmiri Embroidery Pheran',     category:'Kashmiri Wear', sub_category:null,             brand:'Kashmir Valley',        sku:'VIV-KAS-001', price:3499,  original_price:4999,  stock:3,   tag:'hot',  image:'https://images.unsplash.com/photo-1595039838779-f3780873afdd?w=400&q=80',  description:'Authentic Kashmiri Pheran with hand-done sozni embroidery.', fabric:'Wool, Pashmina',    colors:['#1B2A4A','#8B4513','#2D5A1E'], status:'active' },
-  { id:6,  name:'Pakistani Lawn Suit',             category:'Pakistani Wear',sub_category:null,             brand:'Lakhani Fabrics',       sku:'VIV-PAK-001', price:1899,  original_price:2499,  stock:40,  tag:'sale', image:'https://images.unsplash.com/photo-1564489563601-c53cfc451e93?w=400&q=80',  description:'Premium Pakistani lawn suit with exquisite block print.', fabric:'Lawn Cotton',        colors:['#F7F0DC','#E8789A','#4A5E8A'], status:'active' },
-  { id:7,  name:'Georgette Salwar Kameez',         category:'Salwar Suits',  sub_category:null,             brand:'Vividha Studio',       sku:'VIV-SAL-001', price:1599,  original_price:2199,  stock:4,   tag:'new',  image:'https://images.unsplash.com/photo-1601936374000-e31f2735e972?w=400&q=80',  description:'Elegant georgette salwar kameez with mirror work dupatta.', fabric:'Georgette, Net',    colors:['#C9A84C','#E8789A','#1B2A4A'], status:'active' },
-  { id:8,  name:'Maxi Floral Dress',               category:'Dresses & Tops',sub_category:null,             brand:'Fusion by Vividha',    sku:'VIV-DRS-001', price:1199,  original_price:1699,  stock:60,  tag:'new',  image:'https://images.unsplash.com/photo-1583744946564-b52d01a7b321?w=400&q=80',  description:'Breezy floral maxi dress with contemporary Indian-fusion aesthetic.', fabric:'Rayon, Viscose',    colors:['#E8789A','#F7F0DC','#2D5A1E'], status:'active' },
-  { id:9,  name:'Cotton Printed Straight Kurti',  category:'Kurtis',        sub_category:'Straight Kurtis',brand:'Daily Wear Co.',        sku:'VIV-KUR-002', price:699,   original_price:999,   stock:100, tag:'sale', image:'https://images.unsplash.com/photo-1594938298603-c8148c4b4f1a?w=400&q=80',  description:'Comfortable block-printed cotton kurti for daily wear.', fabric:'100% Cotton',        colors:['#C9A84C','#E8789A','#4A5E8A'], status:'active' },
-  { id:10, name:'Bridal Red Silk Saree',           category:'Sarees',        sub_category:'Silk Sarees',    brand:'Bridal Vividha',        sku:'VIV-SAR-002', price:9999,  original_price:14999, stock:2,   tag:'hot',  image:'https://images.unsplash.com/photo-1617142137564-0dade1f5d27b?w=400&q=80',  description:'Luxurious bridal red silk saree with heavy gold embroidery.', fabric:'Pure Silk, Zari',    colors:['#8B0000','#C9A84C'],           status:'active' },
-  { id:11, name:'Embroidered Palazzo Set',         category:'Kurtis',        sub_category:'Kaftan',         brand:'Vividha Studio',       sku:'VIV-KUR-003', price:1799,  original_price:2499,  stock:0,   tag:'new',  image:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',  description:'Boho-chic embroidered palazzo set with matching dupatta.', fabric:'Rayon',              colors:['#E8789A','#F7F0DC','#C9A84C'], status:'inactive' },
-  { id:12, name:'Phulkari Dupatta',                category:'Punjabi Suits', sub_category:null,             brand:'Punjab Pride',          sku:'VIV-PUN-002', price:899,   original_price:1299,  stock:55,  tag:'sale', image:'https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=400&q=80',  description:'Vibrant handwoven Phulkari dupatta from Punjab.', fabric:'Cotton, Silk Thread', colors:['#C9A84C','#E8789A','#8B0000'], status:'active' },
-];
-
-const DEMO_ORDERS = [
-  { id:1, order_no:'VIV20241001', customer:'Priya Sharma',  email:'priya@example.com',  items:2, total:6298,  payment:'paid',    status:'delivered', date:'Dec 10, 2024' },
-  { id:2, order_no:'VIV20241002', customer:'Anjali Verma',  email:'anjali@example.com', items:1, total:8999,  payment:'paid',    status:'shipped',   date:'Dec 18, 2024' },
-  { id:3, order_no:'VIV20241003', customer:'Meera Nair',    email:'meera@example.com',  items:3, total:4197,  payment:'paid',    status:'confirmed', date:'Dec 22, 2024' },
-  { id:4, order_no:'VIV20241004', customer:'Ritu Singh',    email:'ritu@example.com',   items:1, total:4999,  payment:'paid',    status:'pending',   date:'Dec 28, 2024' },
-  { id:5, order_no:'VIV20241005', customer:'Sunita Yadav',  email:'sunita@example.com', items:2, total:3398,  payment:'pending', status:'pending',   date:'Dec 30, 2024' },
-  { id:6, order_no:'VIV20241006', customer:'Lakshmi Iyer',  email:'lak@example.com',    items:1, total:9999,  payment:'paid',    status:'delivered', date:'Jan 02, 2025' },
-  { id:7, order_no:'VIV20250107', customer:'Deepa Menon',   email:'deepa@example.com',  items:4, total:12496, payment:'paid',    status:'shipped',   date:'Jan 07, 2025' },
-  { id:8, order_no:'VIV20250110', customer:'Kavya Reddy',   email:'kavya@example.com',  items:1, total:1299,  payment:'paid',    status:'confirmed', date:'Jan 10, 2025' },
-];
-
-const DEMO_CUSTOMERS = [
-  { id:1, name:'Priya Sharma',  email:'priya@example.com',  phone:'+91 98765 43210', orders:5, total_spent:28495, joined:'Nov 2024', is_admin:false },
-  { id:2, name:'Anjali Verma',  email:'anjali@example.com', phone:'+91 87654 32109', orders:3, total_spent:19998, joined:'Nov 2024', is_admin:false },
-  { id:3, name:'Meera Nair',    email:'meera@example.com',  phone:'+91 76543 21098', orders:8, total_spent:42196, joined:'Oct 2024', is_admin:false },
-  { id:4, name:'Ritu Singh',    email:'ritu@example.com',   phone:'+91 65432 10987', orders:2, total_spent:8598,  joined:'Dec 2024', is_admin:false },
-  { id:5, name:'Sunita Yadav',  email:'sunita@example.com', phone:'+91 55432 10987', orders:1, total_spent:3398,  joined:'Dec 2024', is_admin:false },
-  { id:6, name:'Lakshmi Iyer',  email:'lak@example.com',    phone:'+91 91234 56789', orders:6, total_spent:51294, joined:'Oct 2024', is_admin:false },
-];
-
-const DEMO_BANNERS = [
-  { id:1, title:'Festive Collection 2024', image:'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&q=80', link:'/shop?tag=hot',      position:'hero',   status:'active' },
-  { id:2, title:'Banarasi Heritage Edit',  image:'https://images.unsplash.com/photo-1611811960734-2b1b8b5d17b1?w=600&q=80', link:'/shop?cat=sarees',  position:'mid',    status:'active' },
-  { id:3, title:'New Kurtis Arrival',       image:'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=600&q=80', link:'/shop?cat=kurtis',  position:'bottom', status:'inactive' },
-];
-
-const DEMO_COUPONS = [
-  { id:1, code:'VIVIDHA10',  discount:10, min_order:999,  max_uses:100, used:34, expiry:'2025-06-30', active:true  },
-  { id:2, code:'NEWUSER20',  discount:20, min_order:1499, max_uses:50,  used:12, expiry:'2025-03-31', active:true  },
-  { id:3, code:'FESTIVAL15', discount:15, min_order:2000, max_uses:200, used:89, expiry:'2024-12-31', active:false },
-];
 
 // ── INIT ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
