@@ -105,12 +105,12 @@ async function fetchAPI(endpoint, method = 'GET', body = null) {
 // ── LOAD ALL DATA ─────────────────────────────────────────────
 async function loadAllData() {
   // Try API; fall back to demo data for each resource
- await safeLoad('/categories/', r => { admin.categories = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_categories')||'null') || []); });
-await safeLoad('/products/',   r => { admin.products = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_products')||'null') || []); });
-await safeLoad('/orders/',     r => { admin.orders = r && r.length ? r : (JSON.parse(localStorage.getItem('vividha_admin_orders')||'null') || []); });
-await safeLoad('/customers/',  r => { admin.customers = r && r.length ? r : []; });
-  await safeLoad('/banners/', r => { admin.banners = r && r.length ? r : []; });
-await safeLoad('/coupons/', r => { admin.coupons = r && r.length ? r : []; });
+await safeLoad('/categories/', r => { admin.categories = r && r.length ? r : []; });
+await safeLoad('/products/',   r => { admin.products   = r && r.length ? r : []; });
+await safeLoad('/orders/',     r => { admin.orders     = r && r.length ? r : []; });
+await safeLoad('/customers/',  r => { admin.customers  = r && r.length ? r : []; });
+await safeLoad('/banners/',    r => { admin.banners    = r && r.length ? r : []; });
+await safeLoad('/coupons/',    r => { admin.coupons    = r && r.length ? r : []; });
   admin.filteredProducts = [...admin.products];
   admin.filteredOrders   = [...admin.orders];
 
@@ -324,16 +324,7 @@ function updateSubCatOptions() {
     cat.sub.forEach(s => subSel.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`));
   }
 }
-function resetToDemo() {
-  if (!confirm('Reset all products to demo data? Your added products will be lost.')) return;
-  localStorage.removeItem('vividha_admin_products');
-  admin.products = [...DEMO_PRODUCTS];
-  admin.filteredProducts = [...admin.products];
-  renderAdminProducts();
-  renderDashboard();
-  renderLowStock();
-  showToast('Demo products restored ✓', 'success');
-}
+
 
 function openProductModal(id) {
   admin.editingProductId = id || null;
