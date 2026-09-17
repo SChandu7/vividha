@@ -22,33 +22,8 @@ let state = {
 };
 
 // ── DEMO DATA ──────────────────────────────────────────────────
-const DEMO_CATEGORIES = [
-  { id: 1, name: 'Sarees', slug: 'sarees', image: 'https://images.unsplash.com/photo-1611811960734-2b1b8b5d17b1?w=600&q=80', count: 80,
-    sub: ['Silk Sarees','Cotton Sarees','Banarasi','Kashmiri','Printed','Georgette'] },
-  { id: 2, name: 'Kurtis', slug: 'kurtis', image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=600&q=80', count: 120,
-    sub: ['Straight Kurtis','A-Line','Anarkali','Kaftan','Designer'] },
-  { id: 3, name: 'Punjabi Suits', slug: 'punjabi-suits', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80', count: 65 },
-  { id: 4, name: 'Lehengas', slug: 'lehengas', image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&q=80', count: 45 },
-  { id: 5, name: 'Salwar Suits', slug: 'salwar-suits', image: 'https://images.unsplash.com/photo-1601936374000-e31f2735e972?w=600&q=80', count: 70 },
-  { id: 6, name: 'Kashmiri Wear', slug: 'kashmiri', image: 'https://images.unsplash.com/photo-1595039838779-f3780873afdd?w=600&q=80', count: 30 },
-  { id: 7, name: 'Pakistani Wear', slug: 'pakistani', image: 'https://images.unsplash.com/photo-1564489563601-c53cfc451e93?w=600&q=80', count: 40 },
-  { id: 8, name: 'Dresses & Tops', slug: 'western', image: 'https://images.unsplash.com/photo-1583744946564-b52d01a7b321?w=600&q=80', count: 90 },
-];
 
-const DEMO_PRODUCTS = [
-  { id:1, name:'Kanjivaram Pure Silk Saree', category:'Sarees', sub_category:'Silk Sarees', brand:'Kanjivaram Heritage', price:4999, original_price:7499, stock:12, tag:'hot', image:'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80', description:'Exquisite pure Kanjivaram silk saree with traditional gold zari border. A timeless piece for weddings and celebrations.', fabric:'Pure Silk, Zari', colors:['#8B0000','#1B2A4A','#2D5A1E','#C9A84C'], status:'active' },
-  { id:2, name:'Banarasi Brocade Lehenga', category:'Lehengas', sub_category:'Bridal', brand:'Royal Banaras', price:2, original_price:12999, stock:5, tag:'hot', image:'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&q=80', description:'Stunning Banarasi brocade lehenga with intricate gold work. Perfect for bridal occasions and festive celebrations.', fabric:'Brocade Silk, Net', colors:['#C9A84C','#E8789A','#1B2A4A'], status:'active' },
-  { id:3, name:'Floral Anarkali Kurti', category:'Kurtis', sub_category:'Anarkali', brand:'Vividha Studio', price:1299, original_price:1799, stock:50, tag:'new', image:'https://images.unsplash.com/photo-1597983073540-684a10b15ab1?w=600&q=80', description:'Beautiful floral printed Anarkali kurti with gota patti work. Pairs perfectly with churidar or palazzo.', fabric:'Rayon, Cotton', colors:['#E8789A','#F7F0DC','#4A5E8A'], status:'active' },
-  { id:4, name:'Embroidered Punjabi Suit', category:'Punjabi Suits', sub_category:null, brand:'Punjab Pride', price:2499, original_price:3499, stock:25, tag:'new', image:'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80', description:'Hand-embroidered Punjabi suit with phulkari dupatta. Vibrant colors celebrating the rich culture of Punjab.', fabric:'Cotton, Chiffon Dupatta', colors:['#C9A84C','#E8789A','#2D5A1E'], status:'active' },
-  { id:5, name:'Kashmiri Embroidery Pheran', category:'Kashmiri Wear', sub_category:null, brand:'Kashmir Valley', price:3499, original_price:4999, stock:18, tag:'hot', image:'https://images.unsplash.com/photo-1595039838779-f3780873afdd?w=600&q=80', description:'Authentic Kashmiri Pheran with hand-done sozni embroidery. A rare piece of Kashmir\'s living artistry.', fabric:'Wool, Pashmina blend', colors:['#1B2A4A','#8B4513','#2D5A1E'], status:'active' },
-  { id:6, name:'Pakistani Lawn Suit', category:'Pakistani Wear', sub_category:null, brand:'Lakhani Fabrics', price:1899, original_price:2499, stock:40, tag:'sale', image:'https://images.unsplash.com/photo-1564489563601-c53cfc451e93?w=600&q=80', description:'Premium Pakistani lawn suit with exquisite block print. Lightweight and comfortable for all-day wear.', fabric:'Lawn Cotton, Chiffon', colors:['#F7F0DC','#E8789A','#4A5E8A'], status:'active' },
-  { id:7, name:'Georgette Salwar Kameez', category:'Salwar Suits', sub_category:null, brand:'Vividha Studio', price:1599, original_price:2199, stock:35, tag:'new', image:'https://images.unsplash.com/photo-1601936374000-e31f2735e972?w=600&q=80', description:'Elegant georgette salwar kameez with mirror work dupatta. Effortlessly chic for parties and family events.', fabric:'Georgette, Net', colors:['#C9A84C','#E8789A','#1B2A4A'], status:'active' },
-  { id:8, name:'Maxi Floral Dress', category:'Dresses & Tops', sub_category:null, brand:'Fusion by Vividha', price:1199, original_price:1699, stock:60, tag:'new', image:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80', description:'Breezy floral maxi dress with a contemporary Indian-fusion aesthetic. Perfect for day outings and brunches.', fabric:'Rayon, Viscose', colors:['#E8789A','#F7F0DC','#2D5A1E'], status:'active' },
-  { id:9, name:'Cotton Printed Straight Kurti', category:'Kurtis', sub_category:'Straight Kurtis', brand:'Daily Wear Co.', price:699, original_price:999, stock:100, tag:'sale', image:'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=600&q=80', description:'Comfortable and stylish block-printed cotton kurti for daily wear. Available in multiple vibrant prints.', fabric:'100% Cotton', colors:['#C9A84C','#E8789A','#4A5E8A','#2D5A1E'], status:'active' },
-  { id:10, name:'Bridal Red Silk Saree', category:'Sarees', sub_category:'Silk Sarees', brand:'Bridal Vividha', price:9999, original_price:14999, stock:8, tag:'hot', image:'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&q=80', description:'Luxurious bridal red silk saree with heavy gold embroidery. The ultimate choice for your most special day.', fabric:'Pure Silk, Gold Zari', colors:['#8B0000','#C9A84C'], status:'active' },
-  { id:11, name:'Embroidered Palazzo Set', category:'Kurtis', sub_category:'Kaftan', brand:'Vividha Studio', price:1799, original_price:2499, stock:30, tag:'new', image:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80', description:'Boho-chic embroidered palazzo set with matching dupatta. Flowy, comfortable, and effortlessly stylish.', fabric:'Rayon, Cotton Blend', colors:['#E8789A','#F7F0DC','#C9A84C'], status:'active' },
-  { id:12, name:'Phulkari Dupatta', category:'Punjabi Suits', sub_category:null, brand:'Punjab Pride', price:899, original_price:1299, stock:55, tag:'sale', image:'https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=600&q=80', description:'Vibrant handwoven Phulkari dupatta from Punjab. Adds a pop of color to any ethnic outfit instantly.', fabric:'Cotton, Silk Thread', colors:['#C9A84C','#E8789A','#8B0000','#2D5A1E'], status:'active' },
-];
+
 
 // ── INIT ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -80,6 +55,7 @@ async function loadData() {
   try {
     await loadCategories();
     await loadProducts();
+    await loadStats();
   } catch (e) {
     console.warn('API unavailable:', e.message);
     state.categories = [];
@@ -101,15 +77,100 @@ async function loadCategories() {
 
 async function loadProducts() {
   const res = await fetchAPI('/products/', 'GET');
-  if (res && res.length) {
-    state.products = res;
-  } else {
-    const adminSaved = JSON.parse(localStorage.getItem('vividha_admin_products') || 'null');
-    state.products = adminSaved && adminSaved.length ? adminSaved : [];
-  }
+  state.products = (res && res.length) ? res : [];
   state.filteredProducts = [...state.products];
   renderHomeProducts();
   renderShopProducts();
+  initHeroCarousel();
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const stats = await fetchAPI('/stats/', 'GET');
+    if (!stats) return;
+
+    // Hero badge
+    const heroCount = document.getElementById('heroProductCount');
+    if (heroCount) heroCount.innerHTML = `${stats.total_products}<sup>+</sup>`;
+
+    // Stats bar
+    const statStyles = document.getElementById('statStyles');
+    const statCustomers = document.getElementById('statCustomers');
+    const statCollections = document.getElementById('statCollections');
+
+    if (statStyles) animateCount(statStyles, stats.total_products, '+');
+    if (statCustomers) animateCount(statCustomers, stats.total_customers, '+');
+    if (statCollections) animateCount(statCollections, stats.total_categories, '+');
+  } catch(e) {
+    console.warn('Stats load failed:', e.message);
+  }
+}
+
+function animateCount(el, target, suffix = '') {
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current += step;
+    if (current >= target) {
+      current = target;
+      clearInterval(timer);
+    }
+    el.innerHTML = `${current}<sup>${suffix}</sup>`;
+  }, 40);
+}
+
+// ── HERO CAROUSEL ─────────────────────────────────────────────
+let carouselTimer = null;
+let carouselIndex = 0;
+
+function initHeroCarousel() {
+  const track = document.getElementById('heroCarouselTrack');
+  const dotsEl = document.getElementById('heroCarouselDots');
+  if (!track || !dotsEl) return;
+
+  // Pick up to 5 random product images
+  const prods = state.products
+    .filter(p => p.image && p.status === 'active')
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
+
+  if (!prods.length) {
+    // Fallback single image
+    track.innerHTML = `
+      <div class="hero-carousel-slide">
+        <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80" alt="विVIDHA" />
+      </div>`;
+    return;
+  }
+
+  // Build slides
+  track.innerHTML = prods.map(p => `
+    <div class="hero-carousel-slide">
+      <img src="${p.image}" alt="${p.name}" loading="lazy" />
+    </div>
+  `).join('');
+
+  // Build dots
+  dotsEl.innerHTML = prods.map((_, i) => `
+    <button class="hero-dot${i === 0 ? ' active' : ''}" onclick="goToSlide(${i})"></button>
+  `).join('');
+
+  carouselIndex = 0;
+  clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => {
+    carouselIndex = (carouselIndex + 1) % prods.length;
+    goToSlide(carouselIndex);
+  }, 3000);
+}
+
+function goToSlide(index) {
+  const track = document.getElementById('heroCarouselTrack');
+  const dots  = document.querySelectorAll('.hero-dot');
+  if (!track) return;
+  carouselIndex = index;
+  track.style.transform = `translateX(-${index * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle('active', i === index));
 }
 
 function renderAll() {
