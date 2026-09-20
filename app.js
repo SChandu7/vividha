@@ -688,8 +688,9 @@ function openProductDetail(id) {
         ${p.original_price > p.price ? `<span class="old">₹${p.original_price.toLocaleString()}</span>` : ''}
         ${discount > 0 ? `<span class="price-off" style="font-size:13px; font-weight:700; color:white; background:var(--pink); padding:4px 10px; border-radius:20px;">-${discount}%</span>` : ''}
       </div>
-      <p class="pdm-desc">${p.description || ''}</p>
-      ${p.fabric ? `<div class="pdm-fabric-tag"><i class="fa-solid fa-shirt" style="margin-right:6px;"></i>${p.fabric}</div>` : ''}
+${p.description ? `<p class="pdm-desc">${p.description}</p>` : ''}
+${p.short_desc ? `<p class="pdm-desc" style="font-size:13px; color:var(--gold-dark);">${p.short_desc}</p>` : ''}
+${p.fabric ? `<div class="pdm-fabric-tag"><i class="fa-solid fa-shirt" style="margin-right:6px;"></i>${p.fabric}</div>` : ''}
       ${p.colors && p.colors.length ? `
         <div class="pdm-color-label">Available Colors</div>
         <div class="pdm-colors">${colorsHtml}</div>
