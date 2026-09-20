@@ -339,7 +339,6 @@ function openProductModal(id) {
     setVal('pSku',  p.sku||'');
     setVal('pBrand', p.brand||'');
     setVal('pFabric', p.fabric||'');
-    setVal('pShortDesc', p.short_desc||'');
     setVal('pDesc', p.description||'');
     setVal('pPrice', p.price||'');
     setVal('pOriginalPrice', p.original_price||'');
