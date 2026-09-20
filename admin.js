@@ -742,59 +742,8 @@ function deleteBanner(id) {
 }
 
 // ── COUPONS ──────────────────────────────────────────────────
-function renderCoupons() {
-  const grid = document.getElementById('couponsGrid');
-  if (!grid) return;
-  if (!admin.coupons.length) {
-    grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">No coupons yet.</div>';
-    return;
-  }
-  grid.innerHTML = admin.coupons.map(c => `
-    <div class="coupon-card">
-      <div>
-        <div class="coupon-code">${c.code}</div>
-        <div class="coupon-meta" style="margin-top:4px;">
-          ${c.discount}% OFF · Min ₹${c.min_order} · ${c.used}/${c.max_uses} used · Expires ${c.expiry}
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span class="status-tag ${c.active?'active':'inactive'}">${c.active?'Active':'Expired'}</span>
-        <button class="act-btn del" onclick="deleteCoupon(${c.id})" title="Delete"><i class="fa-solid fa-trash"></i></button>
-      </div>
-    </div>`).join('');
-}
 
-function openCouponModal() {
-  ['couCode','couDiscount','couMin','couMax','couExpiry'].forEach(id => setVal(id,''));
-  openModal('couponModal');
-}
 
-function saveCoupon() {
-  const code     = document.getElementById('couCode')?.value.trim().toUpperCase();
-  const discount = parseInt(document.getElementById('couDiscount')?.value||'0');
-  if (!code || !discount) { showToast('Code and discount % are required', 'error'); return; }
-  const data = {
-    id:        Date.now(),
-    code,
-    discount,
-    min_order: parseInt(document.getElementById('couMin')?.value||'0'),
-    max_uses:  parseInt(document.getElementById('couMax')?.value||'100'),
-    used:      0,
-    expiry:    document.getElementById('couExpiry')?.value || '',
-    active:    true,
-  };
-  admin.coupons.push(data);
-  renderCoupons();
-  closeModal('couponModal');
-  showToast(`Coupon "${code}" created ✓`, 'success');
-}
-
-function deleteCoupon(id) {
-  if (!confirm('Delete this coupon?')) return;
-  admin.coupons = admin.coupons.filter(c => c.id !== id);
-  renderCoupons();
-  showToast('Coupon deleted.', 'success');
-}
 
 // ── LOW STOCK ────────────────────────────────────────────────
 function renderLowStock() {
