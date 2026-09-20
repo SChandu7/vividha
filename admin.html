@@ -314,7 +314,6 @@
       <div class="nav-section-label">Sales</div>
       <div class="nav-item" onclick="showAdminPage('orders', this)"><i class="fa-solid fa-box"></i> Orders</div>
       <div class="nav-item" onclick="showAdminPage('customers', this)"><i class="fa-solid fa-users"></i> Customers</div>
-      <div class="nav-item" onclick="showAdminPage('coupons', this)"><i class="fa-solid fa-ticket"></i> Coupons</div>
       <div class="nav-section-label">Alerts</div>
       <div class="nav-item" onclick="showAdminPage('lowstock', this)"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock <span class="nav-badge" id="lowStockBadge">0</span></div>
     </nav>
@@ -468,16 +467,7 @@
         </div>
       </div>
 
-      <!-- ── COUPONS ── -->
-      <div class="admin-page" id="page-coupons">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Coupons</div>
-            <button class="btn btn-navy btn-sm" onclick="openCouponModal()"><i class="fa-solid fa-plus"></i> Create Coupon</button>
-          </div>
-          <div class="card-body" style="padding:20px; display:flex; flex-direction:column; gap:12px;" id="couponsGrid"></div>
-        </div>
-      </div>
+    
 
       <!-- ── LOW STOCK ── -->
       <div class="admin-page" id="page-lowstock">
@@ -658,30 +648,7 @@
   </div>
 </div>
 
-<!-- ── COUPON MODAL ── -->
-<div class="modal-overlay" id="couponModal">
-  <div class="modal" style="max-width:480px;">
-    <div class="modal-header">
-      <div class="modal-title">Create Coupon</div>
-      <button class="modal-close" onclick="closeModal('couponModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Coupon Code *</label><input class="form-input" id="couCode" type="text" placeholder="VIVIDHA10" style="text-transform:uppercase;" /></div>
-        <div class="form-group"><label class="form-label">Discount %</label><input class="form-input" id="couDiscount" type="number" placeholder="10" min="1" max="100" /></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Min Order (₹)</label><input class="form-input" id="couMin" type="number" placeholder="500" /></div>
-        <div class="form-group"><label class="form-label">Max Uses</label><input class="form-input" id="couMax" type="number" placeholder="100" /></div>
-      </div>
-      <div class="form-group"><label class="form-label">Expires On</label><input class="form-input" id="couExpiry" type="date" /></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('couponModal')">Cancel</button>
-      <button class="btn btn-navy" onclick="saveCoupon()"><i class="fa-solid fa-floppy-disk"></i> Create Coupon</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- ── ORDER STATUS MODAL ── -->
 <div class="modal-overlay" id="orderStatusModal">
