@@ -66,7 +66,12 @@ async function loadData() {
 
 async function loadCategories() {
   const res = await fetchAPI('/categories/', 'GET');
-  state.categories = (res && res.length) ? res : [];
+  state.categories = (res && res.length) ? res.map(c => ({
+  ...c,
+  image: c.image && c.image.startsWith('/media')
+    ? 'https://api.chandus7.in' + c.image
+    : c.image
+})) : [];
   renderCategoryNav();
   renderCategoryDropdown();
   renderCategoryGrid();
@@ -77,7 +82,12 @@ async function loadCategories() {
 
 async function loadProducts() {
   const res = await fetchAPI('/products/', 'GET');
-  state.products = (res && res.length) ? res : [];
+  state.products = (res && res.length) ? res.map(p => ({
+    ...p,
+    image: p.image && p.image.startsWith('/media')
+      ? 'https://api.chandus7.in' + p.image
+      : p.image
+  })) : [];
   state.filteredProducts = [...state.products];
   renderHomeProducts();
   renderShopProducts();
