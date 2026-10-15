@@ -507,24 +507,109 @@ function renderAdminCategories() {
     </tr>`).join('');
 }
 
+// ── CATEGORY IMAGE UPLOAD ─────────────────────────────────────
+function fixMediaUrl(u) {
+  if (!u) return '';
+  u = String(u).trim();
+  if (u.startsWith('/media')) return 'https://api.chandus7.in' + u;
+  return u
+    .replace('https://vividhaa.com/media/', 'https://api.chandus7.in/media/')
+    .replace('http://vividhaa.com/media/',  'https://api.chandus7.in/media/');
+}
+
+function previewCatImage(url) {
+  const img = document.getElementById('cImagePreview');
+  if (!img) return;
+  if (url) {
+    img.src = fixMediaUrl(url);
+    img.style.display = 'block';
+    img.onerror = () => { img.style.display = 'none'; };
+  } else {
+    img.style.display = 'none';
+  }
+}
+
+async function uploadCategoryImage(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('cImageStatus');
+  const show = (msg, color) => {
+    if (!status) return;
+    status.textContent = msg;
+    status.style.color = color || 'var(--text-muted)';
+    status.style.display = 'block';
+  };
+
+  if (!file.type.startsWith('image/')) {
+    showToast('Please pick an image file', 'error'); input.value = ''; return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Image too big — keep it under 5 MB', 'error'); input.value = ''; return;
+  }
+
+  // show it instantly while the upload runs
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('cImagePreview');
+    if (img) { img.src = e.target.result; img.style.display = 'block'; }
+  };
+  reader.readAsDataURL(file);
+  show('Uploading…');
+
+  try {
+    const fd = new FormData();
+    fd.append('image', file);
+    fd.append('file',  file);          // whichever name the backend reads
+    fd.append('folder', 'categories');
+
+    // no Content-Type header here — the browser must set the multipart boundary
+    const headers = {};
+    if (admin.token && admin.token !== 'demo-admin-token') {
+      headers['Authorization'] = `Token ${admin.token}`;
+    }
+
+    const res = await fetch(API + '/upload/', { method: 'POST', headers, body: fd });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    const data = await res.json();
+    const url  = data && (data.url || data.image || data.file_url || data.location);
+    if (!url) throw new Error('no URL in response');
+
+    document.getElementById('cImage').value = fixMediaUrl(url);
+    previewCatImage(url);
+    show('Uploaded ✓ — now click "Save Category"', '#2E7D54');
+    showToast('Image uploaded ✓', 'success');
+  } catch (e) {
+    show('Upload failed — paste an image URL instead', '#C0392B');
+    showToast('Upload failed: ' + e.message, 'error');
+  } finally {
+    input.value = '';
+  }
+}
+
 function openCategoryModal(id) {
   admin.editingCategoryId = id || null;
   document.getElementById('catModalTitle').textContent = id ? 'Edit Category' : 'Add Category';
+
+  const status = document.getElementById('cImageStatus');
+  if (status) status.style.display = 'none';
 
   if (id) {
     const c = admin.categories.find(x => x.id === id);
     if (!c) return;
     setVal('editCatId', id);
-    setVal('cName',  c.name||'');
-    setVal('cSlug',  c.slug||'');
-    setVal('cImage', c.image||'');
-    setVal('cSubs',  (c.sub||[]).join(', '));
+    setVal('cName',  c.name  || '');
+    setVal('cSlug',  c.slug  || '');
+    setVal('cImage', c.image || '');
+    setVal('cSubs',  (c.sub || []).join(', '));
+    previewCatImage(c.image || '');
   } else {
-    ['editCatId','cName','cSlug','cImage','cSubs'].forEach(id => setVal(id,''));
+    ['editCatId','cName','cSlug','cImage','cSubs'].forEach(x => setVal(x, ''));
+    previewCatImage('');
   }
   openModal('categoryModal');
 }
-
 async function saveCategory() {
   const name = document.getElementById('cName')?.value.trim();
   if (!name) { showToast('Category name is required', 'error'); return; }
