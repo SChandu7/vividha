@@ -611,9 +611,23 @@
         <label class="form-label">Slug</label>
         <input class="form-input" type="text" id="cSlug" placeholder="sarees (auto-generated)" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Image URL</label>
-        <input class="form-input" type="url" id="cImage" placeholder="https://..." />
+          <div class="form-group">
+        <label class="form-label">Category Image</label>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+          <input class="form-input" type="text" id="cImage" style="flex:1;"
+                 placeholder="Paste a URL, or use Upload →"
+                 oninput="previewCatImage(this.value)" />
+          <button type="button" class="btn btn-outline" style="white-space:nowrap;"
+                  onclick="document.getElementById('cImageFile').click()">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i> Upload
+          </button>
+        </div>
+        <input type="file" id="cImageFile" accept="image/*" style="display:none;"
+               onchange="uploadCategoryImage(this)" />
+        <div id="cImageStatus" style="font-size:12px;display:none;margin-bottom:6px;"></div>
+        <img id="cImagePreview" alt=""
+             style="display:none;width:96px;height:118px;object-fit:cover;
+                    object-position:top center;border-radius:8px;border:1px solid var(--border);" />
       </div>
       <div class="form-group">
         <label class="form-label">Sub-Categories (comma-separated)</label>
