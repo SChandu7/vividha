@@ -752,6 +752,9 @@ async function toggleAdminFlag(id, val) {
   showToast(`Admin access ${val ? 'granted' : 'revoked'} ✓`, 'success');
 }
 
+// coupons tab was removed — keep this stub so loadAllData doesn't throw
+function renderCoupons() {}
+
 // ── BANNERS ──────────────────────────────────────────────────
 function renderBanners() {
   const grid = document.getElementById('bannersGrid');
