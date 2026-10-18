@@ -261,7 +261,7 @@ function renderAdminProducts(list) {
     const si = p.stock === 0 ? '✕' : p.stock <= 5 ? '⚠' : '✓';
     const disc = p.original_price > p.price ? Math.round((1-p.price/p.original_price)*100) : 0;
     return `<tr>
-      <td><img class="td-img" src="${p.image||''}" alt="" loading="lazy" onerror="this.src='https://via.placeholder.com/44x54/F2EDE3/999?text=img'" /></td>
+      <td><img class="td-img" src="${fixMediaUrl(p.image||'')}" alt="" loading="lazy" onerror="this.src='https://via.placeholder.com/44x54/F2EDE3/999?text=img'" /></td>
       <td>
         <div class="td-name">${p.name}</div>
         ${p.tag ? `<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:10px;background:${p.tag==='hot'?'var(--pink)':p.tag==='new'?'var(--navy)':'var(--gold)'};color:white;">${p.tag}</span>` : ''}
@@ -438,7 +438,7 @@ function previewImageUrl(url) {
   const img = document.getElementById('pImagePreview');
   if (!img) return;
   if (url) {
-    img.src = url;
+    img.src = fixMediaUrl(url);
     img.style.display = 'block';
     img.onerror = () => { img.style.display = 'none'; };
   } else {
@@ -492,7 +492,7 @@ function renderAdminCategories() {
   if (!body) return;
   body.innerHTML = admin.categories.map(c => `
     <tr>
-      <td><img class="td-img" src="${c.image||''}" alt="" loading="lazy" onerror="this.src='https://via.placeholder.com/44x54/F2EDE3/999?text=img'" /></td>
+      <td><img class="td-img" src="${fixMediaUrl(c.image||'')}" alt="" loading="lazy" onerror="this.src='https://via.placeholder.com/44x54/F2EDE3/999?text=img'" /></td>
       <td class="td-name">${c.name}</td>
       <td style="font-family:monospace;font-size:11px;color:var(--text-muted);">${c.slug||slugify(c.name)}</td>
       <td>${c.count||0}</td>
@@ -513,8 +513,10 @@ function fixMediaUrl(u) {
   u = String(u).trim();
   if (u.startsWith('/media')) return 'https://api.chandus7.in' + u;
   return u
-    .replace('https://vividhaa.com/media/', 'https://api.chandus7.in/media/')
-    .replace('http://vividhaa.com/media/',  'https://api.chandus7.in/media/');
+    .replace('https://www.vividhaa.com/media/', 'https://api.chandus7.in/media/')
+    .replace('https://vividhaa.com/media/',     'https://api.chandus7.in/media/')
+    .replace('http://vividhaa.com/media/',      'https://api.chandus7.in/media/')
+    .replace('http://api.chandus7.in',          'https://api.chandus7.in');
 }
 
 function previewCatImage(url) {
@@ -765,7 +767,7 @@ function renderBanners() {
   }
   grid.innerHTML = admin.banners.map(b => `
     <div class="banner-card">
-      <img src="${b.image||''}" alt="${b.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x140/F2EDE3/999?text=Banner'" />
+      <img src="${fixMediaUrl(b.image||'')}" alt="${b.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x140/F2EDE3/999?text=Banner'" />
       <div class="banner-card-info">
         <div class="banner-card-title">${b.title}</div>
         <div class="banner-card-meta">
