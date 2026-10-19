@@ -993,9 +993,11 @@ function openCheckout() {
   closeCart();
   const total = state.cart.reduce((s,i) => s + i.price * i.qty, 0);
  const gstRate  = total <= 1000 ? 5 : 12;
-const cgst     = Math.round(total * (gstRate/2) / 100 * 100) / 100;
-const sgst     = Math.round(total * (gstRate/2) / 100 * 100) / 100;
-const finalTotal = Math.round((total + cgst + sgst) * 100) / 100;
+const base     = Math.round((total / (1 + gstRate / 100)) * 100) / 100;
+const taxTotal = Math.round((total - base) * 100) / 100;
+const cgst     = Math.round((taxTotal / 2) * 100) / 100;
+const sgst     = Math.round((taxTotal - cgst) * 100) / 100;  // remainder keeps sum exact
+const finalTotal = total;  // total is UNCHANGED — GST is carved out, not added
 
 document.getElementById('coSubtotal').textContent  = `₹${total.toLocaleString()}`;
 document.getElementById('coCgstRate').textContent   = (gstRate/2).toFixed(1);
